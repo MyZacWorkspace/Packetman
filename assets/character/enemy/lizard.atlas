@@ -1,0 +1,138 @@
+lizard.png
+size: 627, 44
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+walk_right
+  rotate: false
+  xy: 0, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+walk_right
+  rotate: false
+  xy: 33, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+walk_right
+  rotate: false
+  xy: 66, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+walk_right
+  rotate: false
+  xy: 99, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+hi_bite
+  rotate: false
+  xy: 132, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+hi_bite
+  rotate: false
+  xy: 165, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+hi_bite
+  rotate: false
+  xy: 198, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+hi_bite
+  rotate: false
+  xy: 231, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+hi_bite
+  rotate: false
+  xy: 264, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+hi_bite
+  rotate: false
+  xy: 297, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+hi_bite
+  rotate: false
+  xy: 330, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+hi_bite
+  rotate: false
+  xy: 363, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+hi_bite
+  rotate: false
+  xy: 396, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+lo_kick
+  rotate: false
+  xy: 429, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+lo_kick
+  rotate: false
+  xy: 462, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+lo_kick
+  rotate: false
+  xy: 495, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+lo_kick
+  rotate: false
+  xy: 528, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+laser_eye
+  rotate: false
+  xy: 561, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1
+laser_eye
+  rotate: false
+  xy: 594, 0
+  size: 33, 44
+  orig: 33, 44
+  offset: 0, 0
+  index: -1

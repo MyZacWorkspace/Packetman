@@ -1,0 +1,60 @@
+Use this file to credit assets
+
+##Graphics 
+
+calvin.png, cappy_coin.png, water.png, laser.png, lizard.png , made by Zaccery Tarver s1338565@monmouth.edu 
+
+
+# background1.png 
+https://owmyknees.itch.io/wasteland-city-parallax-background
+
+# ground1.png
+https://gamemaker.io/en/tutorials/easy-platformer
+
+##Sounds and Music 
+
+# Footstep_Right_Stone.ogg (Project 2)
+https://angrymaximus.itch.io/footstep-sounds-plugin 
+
+# Jump.wav (Project 2)
+https://simon-develop.itch.io/jump-sound-100-free 
+
+#Game Over Arcade 
+https://pixabay.com/sound-effects/search/arcade/ 
+
+#Atari SFX
+https://yogi-tronimal.itch.io/atari-sfx 
+
+#Lizard Biting Sound Effect (Metal Sound)
+https://pixabay.com/sound-effects/search/fighting-game/ 
+
+#Retro Coin 3
+https://pixabay.com/sound-effects/search/coin/
+
+#Water Splash (send and land)
+drop.wav from project 1 extended drop
+https://pixabay.com/sound-effects/search/water%20splash/
+
+#Successful Hit sound effect (for Cappy) (Punch)
+https://pixabay.com/sound-effects/search/punch%20hit/
+
+# strong hit (lizard successful kick)
+https://pixabay.com/sound-effects/search/punch%20hit/
+
+# laser shot ingame (Lizard laser send)
+https://pixabay.com/sound-effects/search/laser/
+
+#Laser (Lizard laser hit landed)
+https://pixabay.com/sound-effects/search/laser/ 
+
+#Lizard footstep (metal_01_b.wav)
+https://thowsenmedia.itch.io/video-game-footstep-sound-pack
+
+#Hit Nullification (Two Attacks Meet)
+https://pixabay.com/sound-effects/search/sword%20clash/
+
+#Chemical Plant Zone (Level Music)
+https://archive.org/download/SonicTheHedgehog2 
+https://ia600905.us.archive.org/11/items/SonicTheHedgehog2/03.%20Chemical%20Plant%20Zone.mp3
+
+
