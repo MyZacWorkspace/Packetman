@@ -21,13 +21,14 @@ public class Calvin extends Game
         //FIXME
         //May need to change in the future for uniform
         //World Scale
-        viewport = new FitViewport(8, 5);
+        viewport = new FitViewport(940,780);
         font.setUseIntegerPositions(false);
         font.getData().setScale(viewport.getWorldHeight() / Gdx.graphics.getHeight());
     }
 
     public void render()
     {
+        this.setScreen(new MainMenuScreen(this));
         super.render();
     }
 
