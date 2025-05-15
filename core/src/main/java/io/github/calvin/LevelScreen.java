@@ -8,42 +8,47 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
-public class MainMenuScreen implements Screen
+public class LevelScreen implements Screen
 {
-    final Calvin game;
+    Calvin game;
 
-    public MainMenuScreen(final Calvin game)
+    public LevelScreen(final Calvin game) 
     {
+        //As usual set a reference to the original Calvin object
         this.game = game;
+
+        
+    }
+
+
+    //FIXME 
+    //Create the world
+    public void generateWorld()
+    {
+
     }
 
     @Override
     public void render(float delta)
     {
         ScreenUtils.clear(Color.BLACK);
-        
+
         game.viewport.apply();
         game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
 
         game.batch.begin();
 
-        game.font.draw(game.batch, "Calvin the Capybara :)" , 100, 150);
-        game.font.draw(game.batch, "Click anywhere to begin!", 100, 100);
+        game.font.draw(game.batch, "Gameplay shown here", 100, 150);
+
         game.batch.end();
-
-        if(Gdx.input.isKeyPressed(Input.Keys.Z))
-        {
-            System.out.println("GAME START");
-            game.setScreen(new LevelScreen(game));
-        }
-    }
-
-    @Override
-    public void resize(int width, int height)
-    {
-        game.viewport.update(width, height, true);
     }
     
+
+    @Override
+    public void resize(int width, int height) {
+        game.viewport.update(width, height, true);
+    }
+
     @Override
     public void show() {
     }
@@ -63,4 +68,5 @@ public class MainMenuScreen implements Screen
     @Override
     public void dispose() {
     }
+    
 }

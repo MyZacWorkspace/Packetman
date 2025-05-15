@@ -24,11 +24,11 @@ public class Calvin extends Game
         viewport = new FitViewport(940,780);
         font.setUseIntegerPositions(false);
         font.getData().setScale(viewport.getWorldHeight() / Gdx.graphics.getHeight());
+        this.setScreen(new MainMenuScreen(this));
     }
 
     public void render()
     {
-        this.setScreen(new MainMenuScreen(this));
         super.render();
     }
 
