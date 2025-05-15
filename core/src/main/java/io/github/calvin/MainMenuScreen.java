@@ -27,8 +27,8 @@ public class MainMenuScreen implements Screen
 
         game.batch.begin();
 
-        game.font.draw(game.batch, "Calvin the Capybara :)" , 100, 150);
-        game.font.draw(game.batch, "Click anywhere to begin!", 100, 100);
+        game.font.draw(game.batch, "Calvin the Capybara :)" , 100/game.PIXELS_IN_METERS, 450/game.PIXELS_IN_METERS);
+        game.font.draw(game.batch, "Click anywhere to begin!", 100/game.PIXELS_IN_METERS, 100/game.PIXELS_IN_METERS);
         game.batch.end();
 
         if(Gdx.input.isKeyPressed(Input.Keys.Z))

@@ -12,16 +12,15 @@ public class Calvin extends Game
     public BitmapFont font;
     public FitViewport viewport;
 
+    final int PIXELS_IN_METERS = 100;
+
     public void create()
     {
         batch = new SpriteBatch();
 
         font = new BitmapFont();
 
-        //FIXME
-        //May need to change in the future for uniform
-        //World Scale
-        viewport = new FitViewport(940,780);
+        viewport = new FitViewport(940 /PIXELS_IN_METERS, 780 /PIXELS_IN_METERS);
         font.setUseIntegerPositions(false);
         font.getData().setScale(viewport.getWorldHeight() / Gdx.graphics.getHeight());
         this.setScreen(new MainMenuScreen(this));
