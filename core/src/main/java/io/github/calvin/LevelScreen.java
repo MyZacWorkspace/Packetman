@@ -15,8 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import com.badlogic.gdx.controllers.*;
 
-public class LevelScreen implements Screen , ControllerListener
-{
+public class LevelScreen implements Screen, ControllerListener, ContactListener {
     Calvin game;
     World world;
     Box2DDebugRenderer b2ddr;
@@ -25,7 +24,6 @@ public class LevelScreen implements Screen , ControllerListener
 
     //Sprites
     PlayerSprite player;
-    int playerState = 0;
 
     //Sample Player World-Object
     BodyDef playerBodyDef;
@@ -49,28 +47,24 @@ public class LevelScreen implements Screen , ControllerListener
     //Input
     Controller firstController;
 
-    public LevelScreen(final Calvin game) 
-    {
+    public LevelScreen(final Calvin game) {
         //As usual set a reference to the original Calvin object
         this.game = game;
 
         orthoCamera = new OrthographicCamera();
         orthoCamera.setToOrtho(false, game.viewport.getWorldWidth(), game.viewport.getWorldHeight());
 
-
         firstController = Controllers.getCurrent();
-        try{ firstController.addListener(this);}
-        catch(NullPointerException npe)
-        {
+        try {
+            firstController.addListener(this);
+        } catch (NullPointerException npe) {
         }
 
         generateSprites();
         generateWorld();
     }
 
-
-    public void generateWorld()
-    {
+    public void generateWorld() {
         world = new World(new Vector2(0, -10), true);
 
         //Sample Ground
@@ -104,34 +98,35 @@ public class LevelScreen implements Screen , ControllerListener
         //Sample Player World-Object
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyType.DynamicBody;
-        //FIXME This should be optimized since the player size can be initially set to always match the scale
-        playerBodyDef.position.set(new Vector2(player.getX() + (player.getWidth() / 25 / 2), player.getY() + (player.getHeight() / 25 / 2)));
+        playerBodyDef.position.set(new Vector2(player.getX(), player.getY()));
         playerBody = world.createBody(playerBodyDef);
         playerBody.setFixedRotation(true);
+        // + (player.getWidth() / 25 / 2)
 
         playerShape = new PolygonShape();
         //This just works -- dividing by half the in game PIXELS-to-METERS Ratio
-        playerShape.setAsBox(player.getWidth() / (game.PIXELS_IN_METERS / 2) , player.getHeight() / (game.PIXELS_IN_METERS / 2));
+        playerShape.setAsBox(player.getWidth() / (game.PIXELS_IN_METERS / 2),
+                player.getHeight() / (game.PIXELS_IN_METERS / 2));
 
         playerFixtureDef = new FixtureDef();
         playerFixtureDef.shape = playerShape;
         playerFixtureDef.density = 0.134f;
-        playerFixtureDef.friction = 0.1f;
+        playerFixtureDef.friction = 0.4f;
         playerFixtureDef.restitution = 0.0f;
         playerFixture = playerBody.createFixture(playerFixtureDef);
         playerShape.dispose();
 
+        world.setContactListener(this);
         b2ddr = new Box2DDebugRenderer();
+
     }
-    
-    public void generateSprites()
-    {
+
+    public void generateSprites() {
         player = new PlayerSprite(5.0f, 2.0f);
     }
 
     @Override
-    public void render(float delta)
-    {
+    public void render(float delta) {
         totalElapsedTime += delta;
 
         ScreenUtils.clear(Color.GRAY);
@@ -156,32 +151,43 @@ public class LevelScreen implements Screen , ControllerListener
     //FIXME implement keylistener, to listen for keyboard events just like a game controller
     //Change character state variables in render and use that to update character state
 
-    private void renderWorld(float delta)
-    {
+    private void renderWorld(float delta) {
         world.step(1 / 60f, 6, 2);
 
-        player.setPosition(playerBody.getPosition().x - (player.getWidth() / 25 / 2), playerBody.getPosition().y - (player.getHeight() / 25 / 2));
+        player.setPosition(playerBody.getPosition().x - (player.getWidth() / 25 / 2),
+                playerBody.getPosition().y - (player.getHeight() / 25 / 2));
 
         b2ddr.render(world, orthoCamera.combined); //Matrix4 debug matrix
 
-
         //BALL
-        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT))
-        {
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             body.applyForceToCenter(-2f, 0.0f, true);
-        }
-        else if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT))
-        {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             body.applyForceToCenter(2f, 0.0f, true);
         }
     }
-    
-    private void updateEntities(float totalElapsedTime, float delta)
-    {
+
+    private void updateEntities(float totalElapsedTime, float delta) {
+        //GRAPHICALLY
+        player.update(totalElapsedTime, delta);
+        //PHYSICALLY
+        if(player.isJumping)
+        {
+            playerBody.applyForceToCenter(0.0f, 40.0f, true);
+            player.isJumping = false;
+            player.isAirborne = true;
+        }
+
+        if (!player.isAirborne)
+        {
+            if (player.isRight) {
+                playerBody.setLinearVelocity(2.0f, playerBody.getLinearVelocity().y);
+            } else if (player.isLeft) {
+                playerBody.setLinearVelocity(-2.0f, playerBody.getLinearVelocity().y);
+            }
+        }
         
-        player.update(totalElapsedTime, delta, 1);
     }
-    
 
     @Override
     public void resize(int width, int height) {
@@ -193,43 +199,54 @@ public class LevelScreen implements Screen , ControllerListener
         groundBox.dispose();
     }
 
-    
     @Override
     public void connected(Controller controller) {
-        
+
         //throw new UnsupportedOperationException("Unimplemented method 'connected'");
     }
 
     @Override
     public void disconnected(Controller controller) {
-        
+
         //throw new UnsupportedOperationException("Unimplemented method 'disconnected'");
     }
 
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
 
-        if (firstController.getButton(firstController.getMapping().buttonDpadRight))
+        controller = firstController;
+        if (!player.isAirborne)
         {
-            //playerState = 1;
+            if (controller.getButton(controller.getMapping().buttonA)) {
+                player.isJumping = true;
+            }
         }
-        else if (firstController.getButton(firstController.getMapping().buttonDpadLeft))
-        {
-            //playerState = 2;
+        
+        if (controller.getButton(controller.getMapping().buttonDpadRight)) {
+            player.isRight = true;
+        } else if (controller.getButton(controller.getMapping().buttonDpadLeft)) {
+            player.isLeft = true;
         }
-        else if (firstController.getButton(firstController.getMapping().buttonA))
-        {
-            //playerState = 3;
-        }
-        //throw new UnsupportedOperationException("Unimplemented method 'buttonDown'");
+      
         return true;
     }
 
-    @Override
+@Override
     public boolean buttonUp(Controller controller, int buttonCode) {
+
+        controller = firstController;
+
+        if (buttonCode == controller.getMapping().buttonDpadRight)
+        {
+            player.isRight = false;
+        }
+        else if ( buttonCode == controller.getMapping().buttonDpadLeft) 
+        {
+            player.isLeft = false;
+        }
         
-        //IF DPAD NOT STILL HELD DOWN
-        //playerState = 0;
+        
+        
         //throw new UnsupportedOperationException("Unimplemented method 'buttonUp'");
         return false;
     }
@@ -253,5 +270,38 @@ public class LevelScreen implements Screen , ControllerListener
     }
     @Override
     public void resume() {
+    }
+
+
+    @Override
+    public void beginContact(Contact contact) {
+        
+        if(contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture))
+        {
+            player.isAirborne = false;
+            //System.out.println("HELLO!");
+        }
+        //throw new UnsupportedOperationException("Unimplemented method 'beginContact'");
+    }
+
+
+    @Override
+    public void endContact(Contact contact) {
+        // TODO Auto-generated method stub
+        //throw new UnsupportedOperationException("Unimplemented method 'endContact'");
+    }
+
+
+    @Override
+    public void preSolve(Contact contact, Manifold oldManifold) {
+        // TODO Auto-generated method stub
+        //throw new UnsupportedOperationException("Unimplemented method 'preSolve'");
+    }
+
+
+    @Override
+    public void postSolve(Contact contact, ContactImpulse impulse) {
+        // TODO Auto-generated method stub
+        //throw new UnsupportedOperationException("Unimplemented method 'postSolve'");
     }
 }

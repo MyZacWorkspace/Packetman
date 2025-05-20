@@ -19,24 +19,28 @@ public class PlayerSprite extends Sprite
 
     private final float ANIMATION_FRAME_SPEED = 0.2f;
 
+    boolean isRight = false;
+    boolean isLeft = false;
+    boolean isJumping = false;
+    boolean isAirborne = false;
+
     public PlayerSprite(float x, float y)
     {
         atlas = new TextureAtlas(Gdx.files.internal("sprites/calvin.atlas"));
 
         walkRight = atlas.findRegions("walk_right");
-        
+
         //Construct a walk left region by just flipping the walk right region
         walkLeft = atlas.findRegions("walk_right");
 
-        for (TextureAtlas.AtlasRegion tar : walkLeft)
-        {
+        for (TextureAtlas.AtlasRegion tar : walkLeft) {
             tar.flip(true, false);
         }
 
         //Set the boundaries for 'cutting' frames for the animation
         //System.out.println( "Width: " + walkRight.get(0).getRegionWidth() + " Height: " + walkRight.get(0).getRegionHeight());
         setBounds(x, y, walkRight.get(0).getRegionWidth(), walkRight.get(0).getRegionHeight());
-        setScale(1/25.0f);
+        setScale(1 / 25.0f);
 
         //Set the initial region of this character
         setRegion(walkRight.get(0));
@@ -48,17 +52,16 @@ public class PlayerSprite extends Sprite
         walkLeftAnimation.setPlayMode(Animation.PlayMode.LOOP);
     }
     
-    public void update(float totalElapsedTime, float delta, int movementState)
+    
+    public void update(float totalElapsedTime, float delta)
     {
-        switch (movementState) {
-            case 1:
+        if (!isAirborne)
+        {
+            if (isRight)
                 setRegion((TextureAtlas.AtlasRegion) walkRightAnimation.getKeyFrame(totalElapsedTime));
-                break;
-            case 2:
+            else if (isLeft)
                 setRegion((TextureAtlas.AtlasRegion) walkLeftAnimation.getKeyFrame(totalElapsedTime));
-            default:
         }
+        
     }
-    //1 - Walking Right
-    //2 - Walking Left
 }
