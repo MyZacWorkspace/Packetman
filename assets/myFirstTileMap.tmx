@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="sample_forest.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztlMEJwDAMA71BskG6QbNASDfo/tvUH1HwAFKhEhxC78NuEdGTJuqRHMI+kynsnVzCVnm3f/u3f/v/mn+EtasPhLWrD4S1qw+Ete3f9+///4a9VXeP2L/2/u+fs8Q8V6SV6w==
+  </data>
+ </layer>
+ <layer id="2" name="Tile Layer 2" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMApGwSgYBaNgFIwUUArEZQMo3wrEbQMoPxjBOzrzQWAFEvsfmhw1+PjMHwUDBwDBuBad
+  </data>
+ </layer>
+</map>

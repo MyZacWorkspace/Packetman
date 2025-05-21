@@ -13,7 +13,15 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.math.Vector2;
 
+import com.badlogic.gdx.graphics.Pixmap;
+
 import com.badlogic.gdx.controllers.*;
+
+//TILED MAP Stuff
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 public class LevelScreen implements Screen, ControllerListener, ContactListener {
     Calvin game;
@@ -32,59 +40,69 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     FixtureDef playerFixtureDef;
     Fixture playerFixture;
 
-    //Sample World-Object
+    //Sample Ball
+    /*
     BodyDef bodyDef;
     Body body;
     CircleShape circle;
     FixtureDef fixtureDef;
     Fixture fixture;
-
+    */
+    
     //Sample Ground
     BodyDef groundBodyDef;
     Body groundBody;
     PolygonShape groundBox;
-
+    
     //Input
     Controller firstController;
-
+    
+    //Tiled Map
+    TiledMap tiledMap;
+    TiledMapRenderer tiledMapRenderer;
+    
     public LevelScreen(final Calvin game) {
         //As usual set a reference to the original Calvin object
         this.game = game;
-
+    
         orthoCamera = new OrthographicCamera();
         orthoCamera.setToOrtho(false, game.viewport.getWorldWidth(), game.viewport.getWorldHeight());
-
+    
         firstController = Controllers.getCurrent();
         try {
             firstController.addListener(this);
         } catch (NullPointerException npe) {
         }
-
+    
         generateSprites();
         generateWorld();
+    
+        tiledMap = new TmxMapLoader().load("myFirstTileMap.tmx");
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1.0f/(game.PIXELS_IN_METERS  - 40));
     }
-
+    
     public void generateWorld() {
         world = new World(new Vector2(0, -10), true);
-
+    
         //Sample Ground
         groundBodyDef = new BodyDef();
         groundBodyDef.position.set(new Vector2(0, 0));
         groundBody = world.createBody(groundBodyDef);
-
+    
         groundBox = new PolygonShape();
         groundBox.setAsBox(orthoCamera.viewportWidth, 10.0f / game.PIXELS_IN_METERS);
         groundBody.createFixture(groundBox, 0.0f);
-
+    
         //Sample World-Object
+        /*
         bodyDef = new BodyDef();
         bodyDef.type = BodyType.DynamicBody;
         bodyDef.position.set(1, 5);
         body = world.createBody(bodyDef);
-
+    
         CircleShape circle = new CircleShape();
         circle.setRadius(15f / (game.PIXELS_IN_METERS / 2));
-
+    
         fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 0.5f;
@@ -92,8 +110,9 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         fixtureDef.restitution = 0.6f;
         fixture = body.createFixture(fixtureDef);
         circle.dispose();
-
+    
         body.applyForceToCenter(3f, 0.0f, true);
+        */
 
         //Sample Player World-Object
         playerBodyDef = new BodyDef();
@@ -101,7 +120,6 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         playerBodyDef.position.set(new Vector2(player.getX(), player.getY()));
         playerBody = world.createBody(playerBodyDef);
         playerBody.setFixedRotation(true);
-        // + (player.getWidth() / 25 / 2)
 
         playerShape = new PolygonShape();
         //This just works -- dividing by half the in game PIXELS-to-METERS Ratio
@@ -110,7 +128,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
         playerFixtureDef = new FixtureDef();
         playerFixtureDef.shape = playerShape;
-        playerFixtureDef.density = 0.134f;
+        playerFixtureDef.density = 0.2f;
         playerFixtureDef.friction = 0.4f;
         playerFixtureDef.restitution = 0.0f;
         playerFixture = playerBody.createFixture(playerFixtureDef);
@@ -133,6 +151,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
         renderWorld(delta);
         orthoCamera.update();
+        tiledMapRenderer.setView(orthoCamera);
+        tiledMapRenderer.render();
 
         game.viewport.apply();
         game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
@@ -160,11 +180,13 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         b2ddr.render(world, orthoCamera.combined); //Matrix4 debug matrix
 
         //BALL
+        /*
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             body.applyForceToCenter(-2f, 0.0f, true);
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             body.applyForceToCenter(2f, 0.0f, true);
         }
+        */
     }
 
     private void updateEntities(float totalElapsedTime, float delta) {
@@ -173,7 +195,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         //PHYSICALLY
         if(player.isJumping)
         {
-            playerBody.applyForceToCenter(0.0f, 40.0f, true);
+            playerBody.applyForceToCenter(0.0f, 80.0f, true);
             player.isJumping = false;
             player.isAirborne = true;
         }
@@ -202,6 +224,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     @Override
     public void connected(Controller controller) {
 
+        //FIXME allow program to work with a controller connected during this session
         //throw new UnsupportedOperationException("Unimplemented method 'connected'");
     }
 
@@ -244,8 +267,6 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         {
             player.isLeft = false;
         }
-        
-        
         
         //throw new UnsupportedOperationException("Unimplemented method 'buttonUp'");
         return false;
