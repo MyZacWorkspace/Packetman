@@ -20,7 +20,7 @@ public class Calvin extends Game
 
         font = new BitmapFont();
 
-        viewport = new FitViewport(940 /PIXELS_IN_METERS, 780 /PIXELS_IN_METERS);
+        viewport = new FitViewport(1200 /PIXELS_IN_METERS, 780 /PIXELS_IN_METERS);
         font.setUseIntegerPositions(false);
         font.getData().setScale(viewport.getWorldHeight() / Gdx.graphics.getHeight());
         this.setScreen(new MainMenuScreen(this));

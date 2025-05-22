@@ -16,7 +16,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Pixmap;
 
 import com.badlogic.gdx.controllers.*;
-
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 //TILED MAP Stuff
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
@@ -73,36 +77,50 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
             firstController.addListener(this);
         } catch (NullPointerException npe) {
         }
+
+        tiledMap = new TmxMapLoader().load("myFirstTileMap.tmx");
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1.0f / (game.PIXELS_IN_METERS - 40));
     
         generateSprites();
         generateWorld();
-    
-        tiledMap = new TmxMapLoader().load("myFirstTileMap.tmx");
-        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1.0f/(game.PIXELS_IN_METERS  - 40));
     }
     
     public void generateWorld() {
         world = new World(new Vector2(0, -10), true);
+
+        MapProperties globalMapProperties = tiledMap.getProperties();
+
+        MapLayer objectLayer = tiledMap.getLayers().get("Object Layer 1");
+        MapObjects gameObjects = objectLayer.getObjects();
+        MapObject theFloor = gameObjects.get(0);
+        MapProperties theFloorProperties = theFloor.getProperties();
+        
     
         //Sample Ground
+        
+        //float pixelWorldHeight = (float)(globalMapProperties.get("height")) * ((float)globalMapProperties.get("tileheight"));
+        //float pixelNotHeight = 
+            //- ((float)(globalMapProperties.get("tileheight")) * 29.0f);
         groundBodyDef = new BodyDef();
         groundBodyDef.position.set(new Vector2(0, 0));
         groundBody = world.createBody(groundBodyDef);
-    
+        
         groundBox = new PolygonShape();
-        groundBox.setAsBox(orthoCamera.viewportWidth, 10.0f / game.PIXELS_IN_METERS);
+
+        groundBox.setAsBox(((float)theFloorProperties.get("width")) / game.PIXELS_IN_METERS, ((float) theFloorProperties.get("height")) / game.PIXELS_IN_METERS);
         groundBody.createFixture(groundBox, 0.0f);
-    
+        
+        
         //Sample World-Object
         /*
         bodyDef = new BodyDef();
         bodyDef.type = BodyType.DynamicBody;
         bodyDef.position.set(1, 5);
         body = world.createBody(bodyDef);
-    
+        
         CircleShape circle = new CircleShape();
         circle.setRadius(15f / (game.PIXELS_IN_METERS / 2));
-    
+        
         fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 0.5f;
@@ -110,7 +128,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         fixtureDef.restitution = 0.6f;
         fixture = body.createFixture(fixtureDef);
         circle.dispose();
-    
+        
         body.applyForceToCenter(3f, 0.0f, true);
         */
 
@@ -140,7 +158,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     }
 
     public void generateSprites() {
-        player = new PlayerSprite(5.0f, 2.0f);
+        player = new PlayerSprite(5.0f, 9.0f);
     }
 
     @Override
@@ -150,6 +168,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         ScreenUtils.clear(Color.GRAY);
 
         renderWorld(delta);
+
         orthoCamera.update();
         tiledMapRenderer.setView(orthoCamera);
         tiledMapRenderer.render();
