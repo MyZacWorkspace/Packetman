@@ -19,6 +19,10 @@ public class PlayerSprite extends Sprite
 
     private final float ANIMATION_FRAME_SPEED = 0.2f;
 
+    //WORLD
+    Float firstHorizontalPosition = null;
+    Float secondHorizontalPosition = null;
+
     boolean isRight = false;
     boolean isLeft = false;
     boolean isJumping = false;
@@ -50,6 +54,16 @@ public class PlayerSprite extends Sprite
         walkLeftAnimation = new Animation<TextureAtlas.AtlasRegion>(ANIMATION_FRAME_SPEED, walkLeft);
         walkRightAnimation.setPlayMode(Animation.PlayMode.LOOP);
         walkLeftAnimation.setPlayMode(Animation.PlayMode.LOOP);
+    }
+
+    public void setHorizontalPositionFirst(Float thePosition)
+    {
+        firstHorizontalPosition = Float.valueOf(thePosition);
+    }
+
+    public float returnHPF()
+    {
+        return firstHorizontalPosition.floatValue();
     }
     
     

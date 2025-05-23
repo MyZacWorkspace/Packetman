@@ -64,6 +64,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     //Tiled Map
     TiledMap tiledMap;
     TiledMapRenderer tiledMapRenderer;
+    float MAP_SCALE_MODIFIER = 60.0f;
     
     public LevelScreen(final Calvin game) {
         //As usual set a reference to the original Calvin object
@@ -79,7 +80,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         }
 
         tiledMap = new TmxMapLoader().load("myFirstTileMap.tmx");
-        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1.0f / (game.PIXELS_IN_METERS - 40));
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1.0f / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
     
         generateSprites();
         generateWorld();
@@ -107,7 +108,10 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         
         groundBox = new PolygonShape();
 
-        groundBox.setAsBox(((float)theFloorProperties.get("width")) / game.PIXELS_IN_METERS, ((float) theFloorProperties.get("height")) / game.PIXELS_IN_METERS);
+        //System.out.println("WIDTH: " + (float) theFloorProperties.get("width"));
+        //System.out.println("HEIGHT: " + (float) theFloorProperties.get("height"));
+        groundBox.setAsBox(((float) theFloorProperties.get("width")) / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER),
+                ((float) theFloorProperties.get("height"))/ (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
         groundBody.createFixture(groundBox, 0.0f);
         
         
@@ -169,6 +173,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
         renderWorld(delta);
 
+        scrollCamera();
         orthoCamera.update();
         tiledMapRenderer.setView(orthoCamera);
         tiledMapRenderer.render();
@@ -187,6 +192,35 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         updateEntities(totalElapsedTime, delta);
     }
 
+    private void scrollCamera()
+    {
+        //First calculate position change for the player
+        //Can only do this if both position values are not null
+        /*
+        float displacement = 0.0f;
+        if(player.firstHorizontalPosition == null)
+        {
+            //Use the body since it logically has the origin at the center of mass
+        
+            player.setHorizontalPositionFirst(Float.valueOf(playerBody.getPosition().x));
+        }
+        */
+        /*
+        else 
+        {
+            player.secondHorizontalPosition = Float.valueOf(playerBody.getPosition().x);
+            displacement = player.secondHorizontalPosition.floatValue() - player.firstHorizontalPosition.floatValue();
+        }
+        
+        //Scrolling from anywhere
+        orthoCamera.position.x += displacement;
+        
+        player.firstHorizontalPosition = player.secondHorizontalPosition;
+        player.secondHorizontalPosition = null;
+        */
+        //System.out.println("FIRST: " + player.returnHPF());
+        //System.out.println("SECOND: " + player.secondHorizontalPosition);
+    }
     //FIXME implement keylistener, to listen for keyboard events just like a game controller
     //Change character state variables in render and use that to update character state
 
