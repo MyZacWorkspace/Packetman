@@ -1,0 +1,68 @@
+cappyCoin.png
+size: 180, 20
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+default
+  rotate: false
+  xy: 0, 0
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: 1
+default
+  rotate: false
+  xy: 20, 0
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: 1
+default
+  rotate: false
+  xy: 40, 0
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: 1
+default
+  rotate: false
+  xy: 60, 0
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: 1
+default
+  rotate: false
+  xy: 80, 0
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: 1
+default
+  rotate: false
+  xy: 100, 0
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: 1
+default
+  rotate: false
+  xy: 120, 0
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: 1
+default
+  rotate: false
+  xy: 140, 0
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: 1
+default
+  rotate: false
+  xy: 160, 0
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: 1

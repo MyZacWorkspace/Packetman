@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.math.Vector2;
-
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.Pixmap;
 
 import com.badlogic.gdx.controllers.*;
@@ -36,6 +36,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     //Sprites
     PlayerSprite player;
+    AnimatedSprite coin;
 
     //Sample Player World-Object
     BodyDef playerBodyDef;
@@ -52,27 +53,27 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     FixtureDef fixtureDef;
     Fixture fixture;
     */
-    
+
     //Sample Ground
     BodyDef groundBodyDef;
     Body groundBody;
     PolygonShape groundBox;
-    
+
     //Input
     Controller firstController;
-    
+
     //Tiled Map
     TiledMap tiledMap;
     TiledMapRenderer tiledMapRenderer;
     float MAP_SCALE_MODIFIER = 60.0f;
-    
+
     public LevelScreen(final Calvin game) {
         //As usual set a reference to the original Calvin object
         this.game = game;
-    
+
         orthoCamera = new OrthographicCamera();
         orthoCamera.setToOrtho(false, game.viewport.getWorldWidth(), game.viewport.getWorldHeight());
-    
+
         firstController = Controllers.getCurrent();
         try {
             firstController.addListener(this);
@@ -80,12 +81,22 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         }
 
         tiledMap = new TmxMapLoader().load("myFirstTileMap.tmx");
-        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1.0f / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
-    
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap,
+                1.0f / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
+
         generateSprites();
         generateWorld();
     }
-    
+
+    public void generateSprites() {
+        player = new PlayerSprite(5.0f, 5.0f);
+        coin = new AnimatedSprite("sprites/cappyCoin.atlas", 0.0f, 0.0f, 0.1f, 20.0f);
+
+        System.out.println(orthoCamera.position.x);
+        System.out.println(orthoCamera.position.y);
+        System.out.println(orthoCamera.position.z);
+    }
+
     public void generateWorld() {
         world = new World(new Vector2(0, -10), true);
 
@@ -95,26 +106,24 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         MapObjects gameObjects = objectLayer.getObjects();
         MapObject theFloor = gameObjects.get(0);
         MapProperties theFloorProperties = theFloor.getProperties();
-        
-    
+
         //Sample Ground
-        
+
         //float pixelWorldHeight = (float)(globalMapProperties.get("height")) * ((float)globalMapProperties.get("tileheight"));
         //float pixelNotHeight = 
-            //- ((float)(globalMapProperties.get("tileheight")) * 29.0f);
+        //- ((float)(globalMapProperties.get("tileheight")) * 29.0f);
         groundBodyDef = new BodyDef();
-        groundBodyDef.position.set(new Vector2(0, 0));
+        groundBodyDef.position.set(0.0f, 0.0f);
         groundBody = world.createBody(groundBodyDef);
-        
+
         groundBox = new PolygonShape();
 
         //System.out.println("WIDTH: " + (float) theFloorProperties.get("width"));
         //System.out.println("HEIGHT: " + (float) theFloorProperties.get("height"));
         groundBox.setAsBox(((float) theFloorProperties.get("width")) / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER),
-                ((float) theFloorProperties.get("height"))/ (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
+                ((float) theFloorProperties.get("height")) / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
         groundBody.createFixture(groundBox, 0.0f);
-        
-        
+
         //Sample World-Object
         /*
         bodyDef = new BodyDef();
@@ -139,7 +148,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         //Sample Player World-Object
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyType.DynamicBody;
-        playerBodyDef.position.set(new Vector2(player.getX(), player.getY()));
+        playerBodyDef.position.set(player.getX(), player.getY());
         playerBody = world.createBody(playerBodyDef);
         playerBody.setFixedRotation(true);
 
@@ -161,10 +170,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     }
 
-    public void generateSprites() {
-        player = new PlayerSprite(5.0f, 9.0f);
-    }
-
+  
     @Override
     public void render(float delta) {
         totalElapsedTime += delta;
@@ -179,89 +185,116 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         tiledMapRenderer.render();
 
         game.viewport.apply();
-        game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
+        game.batch.setProjectionMatrix(orthoCamera.combined);
 
         game.batch.begin();
 
         game.font.draw(game.batch, "Gameplay shown here", 100 / game.PIXELS_IN_METERS, 150 / game.PIXELS_IN_METERS);
 
         player.draw(game.batch);
+        coin.draw(game.batch);
 
         game.batch.end();
 
         updateEntities(totalElapsedTime, delta);
+        
     }
-
-    private void scrollCamera()
-    {
-        //First calculate position change for the player
-        //Can only do this if both position values are not null
-        /*
-        float displacement = 0.0f;
-        if(player.firstHorizontalPosition == null)
-        {
-            //Use the body since it logically has the origin at the center of mass
-        
-            player.setHorizontalPositionFirst(Float.valueOf(playerBody.getPosition().x));
-        }
-        */
-        /*
-        else 
-        {
-            player.secondHorizontalPosition = Float.valueOf(playerBody.getPosition().x);
-            displacement = player.secondHorizontalPosition.floatValue() - player.firstHorizontalPosition.floatValue();
-        }
-        
-        //Scrolling from anywhere
-        orthoCamera.position.x += displacement;
-        
-        player.firstHorizontalPosition = player.secondHorizontalPosition;
-        player.secondHorizontalPosition = null;
-        */
-        //System.out.println("FIRST: " + player.returnHPF());
-        //System.out.println("SECOND: " + player.secondHorizontalPosition);
-    }
-    //FIXME implement keylistener, to listen for keyboard events just like a game controller
-    //Change character state variables in render and use that to update character state
 
     private void renderWorld(float delta) {
         world.step(1 / 60f, 6, 2);
 
-        player.setPosition(playerBody.getPosition().x - (player.getWidth() / 25 / 2),
-                playerBody.getPosition().y - (player.getHeight() / 25 / 2));
-
-        b2ddr.render(world, orthoCamera.combined); //Matrix4 debug matrix
-
-        //BALL
-        /*
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            body.applyForceToCenter(-2f, 0.0f, true);
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            body.applyForceToCenter(2f, 0.0f, true);
+        player.setPosition(playerBody.getPosition().x - player.getWidth() / 2 / 25,
+                playerBody.getPosition().y - player.getHeight() / 2 / 25);
+        b2ddr.render(world, orthoCamera.combined); // Matrix4 debug matrix
+    }
+    private void scrollCamera()
+    {
+        float horizontalDisplacement = 0.0f;
+        //On first frame
+        
+        if(player.initialPosition == null)
+        {
+            player.setInitialPosition(new Vector2(playerBody.getPosition().x, playerBody.getPosition().y));
         }
-        */
+        else
+        {
+            player.setRecentPosition(new Vector2(playerBody.getPosition().x, playerBody.getPosition().y));
+            orthoCamera.translate(horizontalDisplacement, 0.0f, 0.0f);
+            
+            horizontalDisplacement = player.getRecentPosition().x - player.getInitialPosition().x;
+
+            orthoCamera.translate(horizontalDisplacement, 0.0f, 0.0f);
+            player.setInitialPosition(player.getRecentPosition());
+            player.setRecentPosition(null);
+        }
     }
 
     private void updateEntities(float totalElapsedTime, float delta) {
         //GRAPHICALLY
         player.update(totalElapsedTime, delta);
+        coin.update(totalElapsedTime);
         //PHYSICALLY
-        if(player.isJumping)
-        {
+        if (player.isJumping) {
             playerBody.applyForceToCenter(0.0f, 80.0f, true);
             player.isJumping = false;
             player.isAirborne = true;
         }
 
-        if (!player.isAirborne)
-        {
+        if (!player.isAirborne) {
             if (player.isRight) {
                 playerBody.setLinearVelocity(2.0f, playerBody.getLinearVelocity().y);
             } else if (player.isLeft) {
                 playerBody.setLinearVelocity(-2.0f, playerBody.getLinearVelocity().y);
             }
         }
-        
+
+    }
+
+    //Touching Ground Logic!
+    @Override
+    public void beginContact(Contact contact) {
+
+        if (contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture)) {
+            player.isAirborne = false;
+            // System.out.println("HELLO!");
+        }
+        // throw new UnsupportedOperationException("Unimplemented method
+        // 'beginContact'");
+    }
+
+    //Controller Support
+    @Override
+    public boolean buttonDown(Controller controller, int buttonCode) {
+
+        controller = firstController;
+        if (!player.isAirborne) {
+            if (controller.getButton(controller.getMapping().buttonA)) {
+                player.isJumping = true;
+            }
+        }
+
+        if (controller.getButton(controller.getMapping().buttonDpadRight)) {
+            player.isRight = true;
+        } else if (controller.getButton(controller.getMapping().buttonDpadLeft)) {
+            player.isLeft = true;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean buttonUp(Controller controller, int buttonCode) {
+
+        controller = firstController;
+
+        if (buttonCode == controller.getMapping().buttonDpadRight) {
+            player.isRight = false;
+        } else if (buttonCode == controller.getMapping().buttonDpadLeft) {
+            player.isLeft = false;
+        }
+
+        // throw new UnsupportedOperationException("Unimplemented method 'buttonUp'");
+        return false;
     }
 
     @Override
@@ -287,47 +320,11 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         //throw new UnsupportedOperationException("Unimplemented method 'disconnected'");
     }
 
-    @Override
-    public boolean buttonDown(Controller controller, int buttonCode) {
-
-        controller = firstController;
-        if (!player.isAirborne)
-        {
-            if (controller.getButton(controller.getMapping().buttonA)) {
-                player.isJumping = true;
-            }
-        }
-        
-        if (controller.getButton(controller.getMapping().buttonDpadRight)) {
-            player.isRight = true;
-        } else if (controller.getButton(controller.getMapping().buttonDpadLeft)) {
-            player.isLeft = true;
-        }
-      
-        return true;
-    }
-
-@Override
-    public boolean buttonUp(Controller controller, int buttonCode) {
-
-        controller = firstController;
-
-        if (buttonCode == controller.getMapping().buttonDpadRight)
-        {
-            player.isRight = false;
-        }
-        else if ( buttonCode == controller.getMapping().buttonDpadLeft) 
-        {
-            player.isLeft = false;
-        }
-        
-        //throw new UnsupportedOperationException("Unimplemented method 'buttonUp'");
-        return false;
-    }
+   
 
     @Override
     public boolean axisMoved(Controller controller, int axisCode, float value) {
-        
+
         //throw new UnsupportedOperationException("Unimplemented method 'axisMoved'");
         return true;
     }
@@ -336,28 +333,18 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     @Override
     public void show() {
     }
+
     @Override
     public void hide() {
     }
+
     @Override
     public void pause() {
     }
+
     @Override
     public void resume() {
     }
-
-
-    @Override
-    public void beginContact(Contact contact) {
-        
-        if(contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture))
-        {
-            player.isAirborne = false;
-            //System.out.println("HELLO!");
-        }
-        //throw new UnsupportedOperationException("Unimplemented method 'beginContact'");
-    }
-
 
     @Override
     public void endContact(Contact contact) {
@@ -365,13 +352,11 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         //throw new UnsupportedOperationException("Unimplemented method 'endContact'");
     }
 
-
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
         // TODO Auto-generated method stub
         //throw new UnsupportedOperationException("Unimplemented method 'preSolve'");
     }
-
 
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
