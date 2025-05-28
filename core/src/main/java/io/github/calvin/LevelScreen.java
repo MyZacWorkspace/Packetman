@@ -185,17 +185,19 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         tiledMapRenderer.render();
 
         game.viewport.apply();
+        
         game.batch.setProjectionMatrix(orthoCamera.combined);
 
         game.batch.begin();
 
-        game.font.draw(game.batch, "Gameplay shown here", 100 / game.PIXELS_IN_METERS, 150 / game.PIXELS_IN_METERS);
+        
 
         player.draw(game.batch);
         coin.draw(game.batch);
 
         game.batch.end();
 
+      
         updateEntities(totalElapsedTime, delta);
         
     }
