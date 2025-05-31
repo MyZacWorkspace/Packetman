@@ -184,16 +184,20 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         tiledMapRenderer.setView(orthoCamera);
         tiledMapRenderer.render();
 
-        game.viewport.apply();
         
-        game.batch.setProjectionMatrix(orthoCamera.combined);
 
         game.batch.begin();
 
-        
+        game.viewport.apply();
+
+        game.batch.setProjectionMatrix(orthoCamera.combined);
 
         player.draw(game.batch);
         coin.draw(game.batch);
+
+        game.hud_viewport.apply();
+        game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
+        game.font.draw(game.batch, "Calvin the Capybara :)", 100 / game.PIXELS_IN_METERS, 450 / game.PIXELS_IN_METERS);
 
         game.batch.end();
 

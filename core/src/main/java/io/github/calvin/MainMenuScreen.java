@@ -24,36 +24,24 @@ public class MainMenuScreen implements Screen
     {
         ScreenUtils.clear(Color.BLACK);
         
-        game.viewport.apply();
-        game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
+        
         
         game.batch.begin();
+
+        game.viewport.apply();
+        game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
         
         game.font.draw(game.batch, "Calvin the Capybara :)" , 100/game.PIXELS_IN_METERS, 450/game.PIXELS_IN_METERS);
         game.font.draw(game.batch, "Click anywhere to begin!", 100 / game.PIXELS_IN_METERS,
                 100 / game.PIXELS_IN_METERS);
 
-        game.batch.end();
-
-        game.batch.begin();
-
         game.hud_viewport.apply();
-        game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
+        game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
         game.font.draw(game.batch, "It's a cool game", 50 / game.PIXELS_IN_METERS, 600 / game.PIXELS_IN_METERS);
 
         game.batch.end();
-        
-        /*
-        game.hud_viewport.apply();
-        game.hud_batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
 
-        game.hud_batch.begin();
-
-        game.hud_font.draw(game.hud_batch, "Calvin the Capybara :)", 100 / game.PIXELS_IN_METERS, 450 / game.PIXELS_IN_METERS);
-        game.hud_font.draw(game.hud_batch, "Click anywhere to begin!", 100 / game.PIXELS_IN_METERS,
-                100 / game.PIXELS_IN_METERS);
-        game.hud_batch.end();
-        */
+       
         if(Gdx.input.isKeyPressed(Input.Keys.Z))
         {
             System.out.println("GAME START");
@@ -65,6 +53,7 @@ public class MainMenuScreen implements Screen
     public void resize(int width, int height)
     {
         game.viewport.update(width, height, true);
+        game.hud_viewport.update(width, height, true);
     }
     
     @Override

@@ -27,17 +27,12 @@ public class Calvin extends Game
 
         font = new BitmapFont();
 
+       
         viewport = new FitViewport(HORIZONTAL_VP / PIXELS_IN_METERS, VERTICAL_VP / PIXELS_IN_METERS);
         hud_viewport = new FitViewport(HORIZONTAL_VP / PIXELS_IN_METERS, VERTICAL_VP / PIXELS_IN_METERS);
         
         font.setUseIntegerPositions(false);
-        font.getData().setScale(viewport.getWorldHeight() / Gdx.graphics.getHeight());
-
-        //hud_batch = new SpriteBatch();
-        //hud_font = new BitmapFont();
-        
-        //hud_font.setUseIntegerPositions(false);
-        //hud_font.getData().setScale(hud_viewport.getWorldHeight() / Gdx.graphics.getHeight());
+        font.getData().setScale(hud_viewport.getWorldHeight() / Gdx.graphics.getHeight());
 
         this.setScreen(new MainMenuScreen(this));
     }
