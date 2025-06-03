@@ -9,6 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
+import com.badlogic.gdx.utils.Array;
+
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.math.Vector2;
@@ -36,7 +38,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     //Sprites
     PlayerSprite player;
-    AnimatedSprite coin;
+    Array<AnimatedSprite> coins;
+    String COIN_PATH = "sprites/cappyCoin.atlas";
 
     //Sample Player World-Object
     BodyDef playerBodyDef;
@@ -90,7 +93,10 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     public void generateSprites() {
         player = new PlayerSprite(5.0f, 5.0f);
-        coin = new AnimatedSprite("sprites/cappyCoin.atlas", 0.0f, 0.0f, 0.1f, 20.0f);
+        coins = new Array<AnimatedSprite>();
+        coins.add( new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 8.0f, 4.0f));
+        coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 12.0f, 4.0f));
+        coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 16.0f, 4.0f));
 
         System.out.println(orthoCamera.position.x);
         System.out.println(orthoCamera.position.y);
@@ -193,11 +199,14 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         game.batch.setProjectionMatrix(orthoCamera.combined);
 
         player.draw(game.batch);
-        coin.draw(game.batch);
+        for (AnimatedSprite coin : coins)
+        {
+            coin.draw(game.batch);
+        }
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
-        game.font.draw(game.batch, "Calvin the Capybara :)", 100 / game.PIXELS_IN_METERS, 450 / game.PIXELS_IN_METERS);
+        game.font.draw(game.batch, "Calvin the Capybara ", 50 / game.PIXELS_IN_METERS, 120.0f / game.PIXELS_IN_METERS);
 
         game.batch.end();
 
@@ -238,7 +247,16 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     private void updateEntities(float totalElapsedTime, float delta) {
         //GRAPHICALLY
         player.update(totalElapsedTime, delta);
-        coin.update(totalElapsedTime);
+
+        //Remove coins that come into contact with the player
+        for (int c = 0; c < coins.size; c++)
+        {
+
+        }
+        for (AnimatedSprite coin : coins)
+        {
+            coin.update(totalElapsedTime);
+        }
         //PHYSICALLY
         if (player.isJumping) {
             playerBody.applyForceToCenter(0.0f, 80.0f, true);
