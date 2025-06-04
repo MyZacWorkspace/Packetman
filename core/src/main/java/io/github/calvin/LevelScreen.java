@@ -10,6 +10,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Rectangle;
 
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -40,6 +41,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     PlayerSprite player;
     Array<AnimatedSprite> coins;
     String COIN_PATH = "sprites/cappyCoin.atlas";
+    int coinsCollected = 0;
+    long score;
 
     //Sample Player World-Object
     BodyDef playerBodyDef;
@@ -206,7 +209,9 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
-        game.font.draw(game.batch, "Calvin the Capybara ", 50 / game.PIXELS_IN_METERS, 120.0f / game.PIXELS_IN_METERS);
+        game.font.draw(game.batch, "Calvin the Capybara \nCoins " + coinsCollected + "\nScore " + score,
+                50 / game.PIXELS_IN_METERS, 150.0f / game.PIXELS_IN_METERS);
+        
 
         game.batch.end();
 
@@ -245,19 +250,28 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     }
 
     private void updateEntities(float totalElapsedTime, float delta) {
-        //GRAPHICALLY
-        player.update(totalElapsedTime, delta);
-
+      
+        Rectangle playerRect = player.getBoundingRectangle();
+        Rectangle coinRect;
         //Remove coins that come into contact with the player
         for (int c = 0; c < coins.size; c++)
         {
-
+            coinRect = coins.get(c).getBoundingRectangle();
+            if(playerRect.overlaps(coinRect))
+            {
+                coins.removeIndex(c);
+                c--;
+                coinsCollected++;
+                score += 100L;
+            }
         }
         for (AnimatedSprite coin : coins)
         {
             coin.update(totalElapsedTime);
         }
-        //PHYSICALLY
+        player.update(totalElapsedTime, delta);
+        
+
         if (player.isJumping) {
             playerBody.applyForceToCenter(0.0f, 80.0f, true);
             player.isJumping = false;
@@ -324,6 +338,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     @Override
     public void resize(int width, int height) {
         game.viewport.update(width, height, true);
+        game.hud_viewport.update(width, height, true);
     }
 
     @Override
