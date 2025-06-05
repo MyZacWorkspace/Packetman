@@ -17,6 +17,7 @@ public class MainMenuScreen implements Screen
         this.game = game;
         //System.out.println(game.viewport.getCamera().position);
         //System.out.println(game.hud_viewport.getCamera().position);
+        //System.out.println("450 / pix in metres: " + 450 / game.PIXELS_IN_METERS);
     }
 
     @Override
@@ -31,13 +32,13 @@ public class MainMenuScreen implements Screen
         game.viewport.apply();
         game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
         
-        game.font.draw(game.batch, "Calvin the Capybara :)" , 100/game.PIXELS_IN_METERS, 450/game.PIXELS_IN_METERS);
-        game.font.draw(game.batch, "Click anywhere to begin!", 100 / game.PIXELS_IN_METERS,
-                100 / game.PIXELS_IN_METERS);
+        game.font.draw(game.batch, "Calvin the Capybara :)" , 1.0f, 4.5f);
+        game.font.draw(game.batch, "Click anywhere to begin!", 1f,
+                1f);
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
-        game.font.draw(game.batch, "It's a cool game", 50 / game.PIXELS_IN_METERS, 600 / game.PIXELS_IN_METERS);
+        game.font.draw(game.batch, "It's a cool game", 0.5f, 6.0f);
 
         game.batch.end();
 

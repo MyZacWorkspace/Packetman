@@ -101,9 +101,9 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 12.0f, 4.0f));
         coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 16.0f, 4.0f));
 
-        System.out.println(orthoCamera.position.x);
-        System.out.println(orthoCamera.position.y);
-        System.out.println(orthoCamera.position.z);
+        //System.out.println(orthoCamera.position.x);
+        //System.out.println(orthoCamera.position.y);
+        //System.out.println(orthoCamera.position.z);
     }
 
     public void generateWorld() {
@@ -210,7 +210,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
         game.font.draw(game.batch, "Calvin the Capybara \nCoins " + coinsCollected + "\nScore " + score,
-                50 / game.PIXELS_IN_METERS, 150.0f / game.PIXELS_IN_METERS);
+            0.0f, 1.5f);
         
 
         game.batch.end();
