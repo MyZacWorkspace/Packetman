@@ -122,15 +122,17 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         //float pixelNotHeight = 
         //- ((float)(globalMapProperties.get("tileheight")) * 29.0f);
         groundBodyDef = new BodyDef();
-        groundBodyDef.position.set(0.0f, 0.0f);
+        groundBodyDef.position.set(
+                (float) theFloorProperties.get("width") / 2 / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER),
+                (float) theFloorProperties.get("height") / 2 / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
         groundBody = world.createBody(groundBodyDef);
 
         groundBox = new PolygonShape();
 
         //System.out.println("WIDTH: " + (float) theFloorProperties.get("width"));
         //System.out.println("HEIGHT: " + (float) theFloorProperties.get("height"));
-        groundBox.setAsBox(((float) theFloorProperties.get("width")) / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER),
-                ((float) theFloorProperties.get("height")) / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
+        groundBox.setAsBox(((float) theFloorProperties.get("width") / 2) / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER),
+                ((float) theFloorProperties.get("height") / 2) / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
         groundBody.createFixture(groundBox, 0.0f);
 
         //Sample World-Object
@@ -231,6 +233,14 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     {
         float horizontalDisplacement = 0.0f;
         //On first frame
+
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+        {
+            orthoCamera.translate(0.0f, -0.1f, 0.0f);
+        }
+        else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            orthoCamera.translate(0.0f, 0.1f, 0.0f);
+        }
         
         if(player.initialPosition == null)
         {
