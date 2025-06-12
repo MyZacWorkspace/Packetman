@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="9">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="11">
  <tileset firstgid="1" source="sample_forest.tsx"/>
  <layer id="1" name="Tile Layer 1" width="32" height="32">
   <data encoding="base64" compression="zlib">
@@ -12,6 +12,7 @@
   </data>
  </layer>
  <objectgroup id="3" name="Object Layer 1">
-  <object id="2" x="1" y="930" width="1024" height="94"/>
+  <object id="2" x="0.181818" y="5" width="1024.82" height="95.9091"/>
+  <object id="10" x="927.75" y="864.25" width="32.25" height="64"/>
  </objectgroup>
 </map>
