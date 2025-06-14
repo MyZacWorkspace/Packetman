@@ -74,6 +74,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     TiledMapRenderer tiledMapRenderer;
     float MAP_SCALE_MODIFIER = 60.0f;
 
+    float tiledMapScale;
+
     public LevelScreen(final Calvin game) {
         //As usual set a reference to the original Calvin object
         this.game = game;
@@ -87,9 +89,11 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         } catch (NullPointerException npe) {
         }
 
+        tiledMapScale = game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER;
+
         tiledMap = new TmxMapLoader().load("myFirstTileMap.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap,
-                1.0f / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
+                1.0f / (tiledMapScale));
 
         generateSprites();
         generateWorld();
@@ -121,6 +125,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         gameBodies = new Array<Body>();
         gameShapes = new Array<PolygonShape>();
         //CONSTRUCT ALL RECTANGULAR OBJECTS from the OBJECT LAYER
+        //Because Tiled Map is like a big sprite, divide by 2 for proper adjustment
         for(int o = 0; o < gameMapObjects.getCount() ; o++)
         {
             currentObject = gameMapObjects.get(o);
@@ -133,15 +138,15 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
             }
             gameObjectBodyDefs.add(new BodyDef());
             gameObjectBodyDefs.get(o).position.set(
-                    (float) currentObjectProps.get("x") / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER),
-                    (float) currentObjectProps.get("y") / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
+                    (float) currentObjectProps.get("x") / (tiledMapScale) + ( (float) currentObjectProps.get("width") / 2/ (tiledMapScale)),
+                    (float) currentObjectProps.get("y") / (tiledMapScale) + ((float) currentObjectProps.get("height")/ 2 / (tiledMapScale)));
             gameBodies.add(world.createBody(gameObjectBodyDefs.get(o)));
 
             gameShapes.add(new PolygonShape());
 
             gameShapes.get(o).setAsBox(
-                    ((float) currentObjectProps.get("width") / 2) / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER),
-                    ((float) currentObjectProps.get("height") / 2) / (game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER));
+                    ((float) currentObjectProps.get("width") /2) / (tiledMapScale),
+                    ((float) currentObjectProps.get("height") /2) / (tiledMapScale));
             gameBodies.get(o).createFixture(gameShapes.get(o), 0.0f);    
         }
 
@@ -205,9 +210,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         scrollCamera();
         orthoCamera.update();
         tiledMapRenderer.setView(orthoCamera);
-        //tiledMapRenderer.render();
-
-        
+        tiledMapRenderer.render();
 
         game.batch.begin();
 
@@ -303,7 +306,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         
 
         if (player.isJumping) {
-            playerBody.applyForceToCenter(0.0f, 80.0f, true);
+            playerBody.applyForceToCenter(0.0f, 110.0f, true);
             player.isJumping = false;
             player.isAirborne = true;
         }
