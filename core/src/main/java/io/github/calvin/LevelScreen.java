@@ -182,12 +182,12 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
         playerShape = new PolygonShape();
         //This just works -- dividing by half the in game PIXELS-to-METERS Ratio
-        playerShape.setAsBox(player.getWidth() / (game.PIXELS_IN_METERS / 2),
-                player.getHeight() / (game.PIXELS_IN_METERS / 2));
+        playerShape.setAsBox(player.getWidth() / 2 / (game.PIXELS_IN_METERS / 2),
+                player.getHeight() / (game.PIXELS_IN_METERS / 2 ));
 
         playerFixtureDef = new FixtureDef();
         playerFixtureDef.shape = playerShape;
-        playerFixtureDef.density = 0.2f;
+        playerFixtureDef.density = 0.33f;
         playerFixtureDef.friction = 0.4f;
         playerFixtureDef.restitution = 0.0f;
         playerFixture = playerBody.createFixture(playerFixtureDef);
@@ -210,7 +210,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         scrollCamera();
         orthoCamera.update();
         tiledMapRenderer.setView(orthoCamera);
-        tiledMapRenderer.render();
+        //tiledMapRenderer.render();
 
         game.batch.begin();
 
