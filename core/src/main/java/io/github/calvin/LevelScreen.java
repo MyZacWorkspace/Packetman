@@ -18,7 +18,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.Pixmap;
-
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.controllers.*;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -30,6 +30,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+
 
 public class LevelScreen implements Screen, ControllerListener, ContactListener {
     Calvin game;
@@ -76,6 +77,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     float tiledMapScale;
 
+    Texture hitTexture;
+
     public LevelScreen(final Calvin game) {
         //As usual set a reference to the original Calvin object
         this.game = game;
@@ -97,6 +100,18 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
         generateSprites();
         generateWorld();
+
+        
+        Rectangle hit = new Rectangle(1.0f, 1.0f, 10.0f, 20.0f);
+        Color hitColor = new Color(0.0f, 0.0f, 255.0f, 50.0f);
+        Pixmap hitPixmap = new Pixmap(10, 20, Pixmap.Format.RGBA4444);
+        hitPixmap.setColor(hitColor);
+        hitPixmap.drawRectangle((int) hit.x, (int) hit.y, (int) hit.width, (int)
+        hit.height);
+        //hitPixmap.fillRectangle((int) hit.x, (int) hit.y, (int) hit.width, (int) hit.height);
+        hitTexture = new Texture(hitPixmap);
+        
+
     }
 
     public void generateSprites() {
@@ -223,6 +238,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         {
             coin.draw(game.batch);
         }
+
+        game.batch.draw(hitTexture, 1.0f, 1.0f);
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
