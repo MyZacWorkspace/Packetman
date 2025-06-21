@@ -102,13 +102,16 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         generateWorld();
 
         
-        Rectangle hit = new Rectangle(1.0f, 1.0f, 10.0f, 20.0f);
-        Color hitColor = new Color(0.0f, 0.0f, 255.0f, 50.0f);
-        Pixmap hitPixmap = new Pixmap(10, 20, Pixmap.Format.RGBA4444);
+        Rectangle hit = new Rectangle(1.0f, 1.0f, 10.0f, 5.0f);
+        Color hitColor = new Color(255.0f, 0.0f, 0.0f, 20.0f);
+        Pixmap hitPixmap = new Pixmap(4, 2, Pixmap.Format.RGBA4444);
         hitPixmap.setColor(hitColor);
         hitPixmap.drawRectangle((int) hit.x, (int) hit.y, (int) hit.width, (int)
         hit.height);
-        //hitPixmap.fillRectangle((int) hit.x, (int) hit.y, (int) hit.width, (int) hit.height);
+        hitPixmap.fillRectangle((int) hit.x, (int) hit.y, (int) hit.width, (int) hit.height);
+
+        //hitPixmap.drawRectangle(5, 5, (int) hit.width, (int) hit.height);
+       // hitPixmap.fillRectangle(5, 5, (int) hit.width, (int) hit.height);
         hitTexture = new Texture(hitPixmap);
         
 

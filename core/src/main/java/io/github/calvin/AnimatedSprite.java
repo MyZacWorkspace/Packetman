@@ -26,6 +26,8 @@ public class AnimatedSprite extends Sprite{
         atlas = new TextureAtlas(Gdx.files.internal(atlasPath));
         defaultSprites = atlas.createSprites("default");
 
+        
+
         this.xSpeed = xSpeed;
         this.ySpeed = ySpeed;
 
@@ -66,7 +68,7 @@ public class AnimatedSprite extends Sprite{
         defaultAnimation = new Animation<Sprite>(ANIMATION_FRAME_SPEED, defaultSprites);
         defaultAnimation.setPlayMode(Animation.PlayMode.LOOP);
 
-        setBounds(xpos, ypos, defaultSprites.get(0).getRegionWidth(), defaultSprites.get(0).getRegionHeight());
+        setBounds(xpos, ypos, defaultSprites.get(0).getRegionWidth() , defaultSprites.get(0).getRegionHeight());
         setScale(1 / rescale);
         setRegion(defaultSprites.get(0));
     }
