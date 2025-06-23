@@ -19,6 +19,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.controllers.*;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -77,7 +78,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     float tiledMapScale;
 
-    Texture hitTexture;
+    Sprite hitBox;
+    Sprite hurtBox;
 
     public LevelScreen(final Calvin game) {
         //As usual set a reference to the original Calvin object
@@ -102,17 +104,17 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         generateWorld();
 
         
-        Rectangle hit = new Rectangle(1.0f, 1.0f, 10.0f, 5.0f);
-        Color hitColor = new Color(255.0f, 0.0f, 0.0f, 20.0f);
-        Pixmap hitPixmap = new Pixmap(4, 2, Pixmap.Format.RGBA4444);
-        hitPixmap.setColor(hitColor);
-        hitPixmap.drawRectangle((int) hit.x, (int) hit.y, (int) hit.width, (int)
-        hit.height);
-        hitPixmap.fillRectangle((int) hit.x, (int) hit.y, (int) hit.width, (int) hit.height);
+        Rectangle hit = new Rectangle(1.0f, 1.0f,
+                10.0f, 5.0f);
+        hitBox = new Sprite(new Texture(Gdx.files.internal("Hit.png")));
+        hitBox.setAlpha(0.50f);
+        hitBox.setBounds(hit.x, hit.y, hit.width, hit.height);
+        Rectangle hurt = new Rectangle(10.0f, 1.0f,
+                10.0f, 5.0f);
+        hurtBox = new Sprite(new Texture(Gdx.files.internal("Hurt.png")));
+        hurtBox.setAlpha(0.50f);
+        hurtBox.setBounds(hurt.x, hurt.y, hurt.width, hurt.height);
 
-        //hitPixmap.drawRectangle(5, 5, (int) hit.width, (int) hit.height);
-       // hitPixmap.fillRectangle(5, 5, (int) hit.width, (int) hit.height);
-        hitTexture = new Texture(hitPixmap);
         
 
     }
@@ -228,7 +230,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         scrollCamera();
         orthoCamera.update();
         tiledMapRenderer.setView(orthoCamera);
-        //tiledMapRenderer.render();
+        tiledMapRenderer.render();
 
         game.batch.begin();
 
@@ -242,7 +244,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
             coin.draw(game.batch);
         }
 
-        game.batch.draw(hitTexture, 1.0f, 1.0f);
+        hitBox.draw(game.batch);
+        hurtBox.draw(game.batch);
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
