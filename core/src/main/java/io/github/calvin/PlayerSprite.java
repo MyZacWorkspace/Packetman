@@ -31,12 +31,12 @@ public class PlayerSprite extends Sprite
 
     public PlayerSprite(float x, float y)
     {
-        atlas = new TextureAtlas(Gdx.files.internal("sprites/calvin.atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("sprites/calvinResprite.atlas"));
 
-        walkRight = atlas.findRegions("walk_right");
+        walkRight = atlas.findRegions("walk");
 
         //Construct a walk left region by just flipping the walk right region
-        walkLeft = atlas.findRegions("walk_right");
+        walkLeft = atlas.findRegions("walk");
 
         for (TextureAtlas.AtlasRegion tar : walkLeft) {
             tar.flip(true, false);

@@ -80,6 +80,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     Sprite hitBox;
     Sprite hurtBox;
+    Sprite duckShop;
 
     public LevelScreen(final Calvin game) {
         //As usual set a reference to the original Calvin object
