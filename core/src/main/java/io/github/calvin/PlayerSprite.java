@@ -18,7 +18,7 @@ public class PlayerSprite extends Sprite
     private Animation walkRightAnimation;
     private Animation walkLeftAnimation;
 
-    private final float ANIMATION_FRAME_SPEED = 0.2f;
+    private final float ANIMATION_FRAME_SPEED = 0.09f;
 
     //For cameraScroll
     Vector2 initialPosition = null;
@@ -28,6 +28,12 @@ public class PlayerSprite extends Sprite
     boolean isLeft = false;
     boolean isJumping = false;
     boolean isAirborne = false;
+
+    //Actions
+    boolean isStandPunchActive;
+    private Array<TextureAtlas.AtlasRegion> standPunch;
+    private Animation standPunchAnimation;
+    float standPunchAnimationTime;
 
     public PlayerSprite(float x, float y)
     {
@@ -55,6 +61,13 @@ public class PlayerSprite extends Sprite
         walkLeftAnimation = new Animation<TextureAtlas.AtlasRegion>(ANIMATION_FRAME_SPEED, walkLeft);
         walkRightAnimation.setPlayMode(Animation.PlayMode.LOOP);
         walkLeftAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        
+        //Action Animations
+        isStandPunchActive = false;
+        standPunch = atlas.findRegions("stand_punch");
+        standPunchAnimation = new Animation<TextureAtlas.AtlasRegion>(0.04f, standPunch);
+        standPunchAnimation.setPlayMode(Animation.PlayMode.NORMAL);
+        standPunchAnimationTime = 0.0f;
     }
 
     public void setInitialPosition(Vector2 initialPosition)
@@ -79,7 +92,24 @@ public class PlayerSprite extends Sprite
     
     public void update(float totalElapsedTime, float delta)
     {
-        if (!isAirborne)
+        
+        if(isStandPunchActive)
+        {
+            setRegion((TextureAtlas.AtlasRegion) standPunchAnimation.getKeyFrame(standPunchAnimationTime));
+            standPunchAnimationTime += delta;
+
+            if(standPunchAnimation.isAnimationFinished(standPunchAnimationTime))
+            {
+                isStandPunchActive = false;
+                standPunchAnimationTime = 0.0f;
+                if (isRight)
+                    setRegion((TextureAtlas.AtlasRegion) walkRight.get(0));
+                else if (isLeft)
+                    setRegion((TextureAtlas.AtlasRegion) walkLeft.get(0));
+            }
+
+        }
+        else if (!isAirborne)
         {
             if (isRight)
                 setRegion((TextureAtlas.AtlasRegion) walkRightAnimation.getKeyFrame(totalElapsedTime));

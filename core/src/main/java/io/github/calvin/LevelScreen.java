@@ -245,8 +245,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
             coin.draw(game.batch);
         }
 
-        hitBox.draw(game.batch);
-        hurtBox.draw(game.batch);
+        //hitBox.draw(game.batch);
+        //hurtBox.draw(game.batch);
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
@@ -362,6 +362,12 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     public boolean buttonDown(Controller controller, int buttonCode) {
 
         controller = firstController;
+
+        if (controller.getButton(controller.getMapping().buttonX))
+        {
+            player.isStandPunchActive = true;
+        }
+
         if (!player.isAirborne) {
             if (controller.getButton(controller.getMapping().buttonA)) {
                 player.isJumping = true;
