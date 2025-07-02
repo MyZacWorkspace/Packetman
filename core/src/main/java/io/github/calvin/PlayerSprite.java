@@ -1,11 +1,14 @@
 package io.github.calvin;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -34,6 +37,11 @@ public class PlayerSprite extends Sprite
     private Array<TextureAtlas.AtlasRegion> standPunch;
     private Animation standPunchAnimation;
     float standPunchAnimationTime;
+
+    //THE PUNCH
+    Array<Array<Rectangle>> hitBoxes;
+
+    int currentFrameNumber;
 
     public PlayerSprite(float x, float y)
     {
@@ -68,6 +76,21 @@ public class PlayerSprite extends Sprite
         standPunchAnimation = new Animation<TextureAtlas.AtlasRegion>(0.04f, standPunch);
         standPunchAnimation.setPlayMode(Animation.PlayMode.NORMAL);
         standPunchAnimationTime = 0.0f;
+
+        //SAMPLE ATTACK FRAME DATA
+        hitBoxes = new Array<Array<Rectangle>>();
+
+        hitBoxes.add(new Array<Rectangle>());
+        hitBoxes.add(new Array<Rectangle>());
+        hitBoxes.add(new Array<Rectangle>());
+        hitBoxes.add(new Array<Rectangle>());
+        hitBoxes.add(new Array<Rectangle>());
+        hitBoxes.add(new Array<Rectangle>());
+        hitBoxes.add(new Array<Rectangle>());
+        hitBoxes.add(new Array<Rectangle>());
+        hitBoxes.add(new Array<Rectangle>());
+
+        hitBoxes.get(4).add(new Rectangle(0.5f, 0.5f, 1.0f, 0.5f));
     }
 
     public void setInitialPosition(Vector2 initialPosition)
@@ -96,6 +119,7 @@ public class PlayerSprite extends Sprite
         if(isStandPunchActive)
         {
             setRegion((TextureAtlas.AtlasRegion) standPunchAnimation.getKeyFrame(standPunchAnimationTime));
+            currentFrameNumber = standPunchAnimation.getKeyFrameIndex(standPunchAnimationTime);
             standPunchAnimationTime += delta;
 
             if(standPunchAnimation.isAnimationFinished(standPunchAnimationTime))
