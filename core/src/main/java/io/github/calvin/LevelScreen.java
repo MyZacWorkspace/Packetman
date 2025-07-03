@@ -250,7 +250,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         //Have a mutable list of hitbox sprites, and update these according to the current index in the literal and graphical hitbox, then draw. 
         //Do for all.
         if (player.isStandPunchActive && player.currentFrameNumber == 4) {
-            for (Rectangle thisBox : player.hitBoxes.get(4))
+            for (Rectangle thisBox : player.punch.getHitboxes(4))
             {
                 hitBox.setBounds(thisBox.x + playerBody.getWorldCenter().x, thisBox.y + playerBody.getWorldCenter().y,
                         thisBox.width, thisBox.height);
@@ -328,7 +328,7 @@ private void updateEntities(float totalElapsedTime, float delta) {
         for (int c = 0; c < coins.size; c++)
         {
             coinRect = coins.get(c).getBoundingRectangle();
-            Rectangle newHitbox = player.hitBoxes.get(4).get(0);
+            Rectangle newHitbox = player.punch.getHitboxes(4).get(0);
             Rectangle newnewHitbox = new Rectangle(newHitbox.x + playerBody.getWorldCenter().x, 
                     newHitbox.y + playerBody.getWorldCenter().y, newHitbox.width, newHitbox.height);
             //newHitbox.x += playerBody.getWorldCenter().x;

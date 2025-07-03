@@ -39,7 +39,10 @@ public class PlayerSprite extends Sprite
     float standPunchAnimationTime;
 
     //THE PUNCH
-    Array<Array<Rectangle>> hitBoxes;
+    //Array<Array<Rectangle>> hitBoxes;
+
+    //THE NEW PUNCH
+    ActionFrameData punch;
 
     int currentFrameNumber;
 
@@ -78,8 +81,9 @@ public class PlayerSprite extends Sprite
         standPunchAnimationTime = 0.0f;
 
         //SAMPLE ATTACK FRAME DATA
+        /*
         hitBoxes = new Array<Array<Rectangle>>();
-
+        
         hitBoxes.add(new Array<Rectangle>());
         hitBoxes.add(new Array<Rectangle>());
         hitBoxes.add(new Array<Rectangle>());
@@ -89,8 +93,13 @@ public class PlayerSprite extends Sprite
         hitBoxes.add(new Array<Rectangle>());
         hitBoxes.add(new Array<Rectangle>());
         hitBoxes.add(new Array<Rectangle>());
-
+        
         hitBoxes.get(4).add(new Rectangle(0.5f, 0.5f, 1.0f, 0.5f));
+        */
+        
+        //IMPROVED IMPLEMENTATION
+        punch = new ActionFrameData(standPunch.size);
+        punch.appendHitbox(4, 0.2f, 0.1f, 1.0f, 0.5f);
     }
 
     public void setInitialPosition(Vector2 initialPosition)
