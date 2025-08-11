@@ -27,10 +27,15 @@ public class PlayerSprite extends Sprite
     Vector2 initialPosition = null;
     Vector2 recentPosition = null;
 
+    //FIXME if you are not right then you are left, no need for two variables!
+	//These two refer to controller input directions
     boolean isRight = false;
     boolean isLeft = false;
+    boolean isActionFacingRight = true;
     boolean isJumping = false;
     boolean isAirborne = false;
+
+	boolean isFacingRight = true;
 
     //Actions
     boolean isStandPunchActive;
@@ -66,6 +71,7 @@ public class PlayerSprite extends Sprite
 
         //Set the initial region of this character
         setRegion(walkRight.get(0));
+		//isFacingRight = true;
 
         //Construct Animations
         walkRightAnimation = new Animation<TextureAtlas.AtlasRegion>(ANIMATION_FRAME_SPEED, walkRight);
@@ -124,10 +130,25 @@ public class PlayerSprite extends Sprite
     
     public void update(float totalElapsedTime, float delta)
     {
+        TextureRegion currentAtlasRegion = null;
+
+	//System.out.println("isActionFacingRight: " + isActionFacingRight);
         
         if(isStandPunchActive)
         {
-            setRegion((TextureAtlas.AtlasRegion) standPunchAnimation.getKeyFrame(standPunchAnimationTime));
+
+            //FIXME
+            if (isActionFacingRight) //This must be always evaluating to false! So it keeps flipping
+            {
+                currentAtlasRegion = new TextureRegion((TextureAtlas.AtlasRegion) standPunchAnimation.getKeyFrame(standPunchAnimationTime));
+            }
+            else //not initially right, then always use the x-flipped frame (left)
+            { //the issue is that it flips every time when facing left is true, causing flips back and forth
+                currentAtlasRegion = new TextureRegion((TextureAtlas.AtlasRegion) standPunchAnimation.getKeyFrame(standPunchAnimationTime));
+                currentAtlasRegion.flip(true, false);
+            }
+
+            setRegion(currentAtlasRegion);
             currentFrameNumber = standPunchAnimation.getKeyFrameIndex(standPunchAnimationTime);
             standPunchAnimationTime += delta;
 
@@ -145,9 +166,15 @@ public class PlayerSprite extends Sprite
         else if (!isAirborne)
         {
             if (isRight)
+	    {
                 setRegion((TextureAtlas.AtlasRegion) walkRightAnimation.getKeyFrame(totalElapsedTime));
+		isFacingRight = true;
+	    }
             else if (isLeft)
+	    {
                 setRegion((TextureAtlas.AtlasRegion) walkLeftAnimation.getKeyFrame(totalElapsedTime));
+		isFacingRight = false;
+	    }
         }
         
     }

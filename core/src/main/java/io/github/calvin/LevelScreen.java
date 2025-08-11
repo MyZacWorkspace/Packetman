@@ -105,16 +105,16 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         generateWorld();
 
         
-        Rectangle hit = new Rectangle(1.0f, 1.0f,
-                10.0f, 5.0f);
+        //Rectangle hit = new Rectangle(1.0f, 1.0f,
+                //10.0f, 5.0f);
         hitBox = new Sprite(new Texture(Gdx.files.internal("Hit.png")));
         hitBox.setAlpha(0.50f);
-        hitBox.setBounds(hit.x, hit.y, hit.width, hit.height);
-        Rectangle hurt = new Rectangle(10.0f, 1.0f,
-                10.0f, 5.0f);
-        hurtBox = new Sprite(new Texture(Gdx.files.internal("Hurt.png")));
-        hurtBox.setAlpha(0.50f);
-        hurtBox.setBounds(hurt.x, hurt.y, hurt.width, hurt.height);
+        //hitBox.setBounds(hit.x, hit.y, hit.width, hit.height);
+        //Rectangle hurt = new Rectangle(10.0f, 1.0f,
+                //10.0f, 5.0f);
+        //hurtBox = new Sprite(new Texture(Gdx.files.internal("Hurt.png")));
+        //hurtBox.setAlpha(0.50f);
+        //hurtBox.setBounds(hurt.x, hurt.y, hurt.width, hurt.height);
 
         
 
@@ -252,6 +252,9 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         if (player.isStandPunchActive && player.currentFrameNumber == 4) {
             for (Rectangle thisBox : player.punch.getHitboxes(4))
             {
+				
+				//thisBox.x *= -1;
+				//thisBox.y *= -1;
                 hitBox.setBounds(thisBox.x + playerBody.getWorldCenter().x, thisBox.y + playerBody.getWorldCenter().y,
                         thisBox.width, thisBox.height);
                 hitBox.draw(game.batch);
@@ -390,10 +393,41 @@ private void updateEntities(float totalElapsedTime, float delta) {
     public boolean buttonDown(Controller controller, int buttonCode) {
 
         controller = firstController;
+		//FIXME need to check all hit and hurtBoxes
+		Rectangle sampleHitBox = player.punch.getHitboxes(4).get(0);
+		boolean wasActionFacingRight = Boolean.valueOf(player.isActionFacingRight);
 
         if (controller.getButton(controller.getMapping().buttonX))
         {
-            player.isStandPunchActive = true;
+            if (!player.isStandPunchActive) //When the punch is not active
+            {
+				//The action direction is dependent on the direction being faced
+                player.isActionFacingRight = Boolean.valueOf(player.isFacingRight);
+				
+				//System.out.println("wasActionFacingRight: " + wasActionFacingRight);
+				//System.out.println("player.isActionFacingRight: " + player.isActionFacingRight);
+				if(wasActionFacingRight != player.isActionFacingRight) 
+				{
+					if(!player.isActionFacingRight)
+					{
+						sampleHitBox.x *= -1;
+						sampleHitBox.x -= sampleHitBox.width;
+					}
+					else
+					{
+						sampleHitBox.x += sampleHitBox.width;
+						sampleHitBox.x *= -1;
+					}
+					
+				}
+				
+				//System.out.println("HitBox X: " + sampleHitBox.x);
+				//System.out.println("HitBox Width: " + sampleHitBox.width);
+			
+				//System.out.println("Player starts action right: " + player.isFacingRight);
+                player.isStandPunchActive = true;
+            }
+                
         }
 
         if (!player.isAirborne) {
