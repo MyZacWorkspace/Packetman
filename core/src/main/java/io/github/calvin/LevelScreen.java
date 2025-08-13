@@ -46,6 +46,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     String COIN_PATH = "sprites/cappyCoin.atlas";
     int coinsCollected = 0;
     long score;
+	
+	Sprite sirDuck;
 
     //Sample Player World-Object
     BodyDef playerBodyDef;
@@ -126,7 +128,11 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         coins.add( new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 8.0f, 4.0f));
         coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 12.0f, 4.0f));
         coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 16.0f, 4.0f));
-
+		
+		
+		sirDuck = new Sprite(new Texture(Gdx.files.internal("sprites/sirDuck.png")));
+		sirDuck.setPosition(0.0f, 0.0f);
+		sirDuck.setScale(-10.0f);
         //System.out.println(orthoCamera.position.x);
         //System.out.println(orthoCamera.position.y);
         //System.out.println(orthoCamera.position.z);
@@ -231,7 +237,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         scrollCamera();
         orthoCamera.update();
         tiledMapRenderer.setView(orthoCamera);
-        tiledMapRenderer.render();
+        //tiledMapRenderer.render();
 
         game.batch.begin();
 
@@ -244,6 +250,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         {
             coin.draw(game.batch);
         }
+		
+		sirDuck.draw(game.batch);
 
         // CHECK ATTACKS -- HITBOX VISUALIZATION
         //Remember Indexing starts at frame zero!
