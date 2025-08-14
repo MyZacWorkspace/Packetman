@@ -82,26 +82,28 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     Sprite hitBox;
     Sprite hurtBox;
-    Sprite duckShop;
 
-    public LevelScreen(final Calvin game) {
+    public LevelScreen(final Calvin game, Controller control) {
         //As usual set a reference to the original Calvin object
         this.game = game;
 
         orthoCamera = new OrthographicCamera();
         orthoCamera.setToOrtho(false, game.viewport.getWorldWidth(), game.viewport.getWorldHeight());
 
-        firstController = Controllers.getCurrent();
-        try {
-            firstController.addListener(this);
-        } catch (NullPointerException npe) {
-        }
 
         tiledMapScale = game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER;
 
         tiledMap = new TmxMapLoader().load("myFirstTileMap.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap,
                 1.0f / (tiledMapScale));
+				
+				
+		firstController = control;
+		  try {
+            firstController.addListener(this);
+        } catch (NullPointerException npe) {
+        }
+		
 
         generateSprites();
         generateWorld();
@@ -131,8 +133,13 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 		
 		
 		sirDuck = new Sprite(new Texture(Gdx.files.internal("sprites/sirDuck.png")));
-		sirDuck.setPosition(0.0f, 0.0f);
-		sirDuck.setScale(-10.0f);
+		//sirDuck.setBounds(0.0f, 0.0f, sirDuck.getWidth()/game.PIXELS_IN_METERS, sirDuck.getHeight()/game.PIXELS_IN_METERS);
+		
+		sirDuck.setPosition(25.0f, 2.3f);
+		sirDuck.setSize(sirDuck.getWidth()/game.PIXELS_IN_METERS * 5, sirDuck.getHeight()/game.PIXELS_IN_METERS * 5);
+
+		//System.out.println("Duck Width: " + sirDuck.getWidth());
+		//System.out.println("Duck Height: " + sirDuck.getHeight());
         //System.out.println(orthoCamera.position.x);
         //System.out.println(orthoCamera.position.y);
         //System.out.println(orthoCamera.position.z);
@@ -332,6 +339,15 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 private void updateEntities(float totalElapsedTime, float delta) {
       
         Rectangle playerRect = player.getBoundingRectangle();
+		Rectangle duckRect = sirDuck.getBoundingRectangle();
+		
+		//end game
+		if(playerRect.overlaps(duckRect))
+		{
+			firstController.removeListener(this);
+			game.create();
+		}
+		
         Rectangle coinRect;
         //Remove coins that come into contact with the player
         //Updated so that the punch move collects coins

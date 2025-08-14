@@ -8,16 +8,21 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
+import com.badlogic.gdx.controllers.*;
+
 public class MainMenuScreen implements Screen
 {
     final Calvin game;
+	
+	Controller firstController;
 
-    public MainMenuScreen(final Calvin game)
+    public MainMenuScreen(final Calvin game, Controller control)
     {
         this.game = game;
         //System.out.println(game.viewport.getCamera().position);
         //System.out.println(game.hud_viewport.getCamera().position);
         //System.out.println("450 / pix in metres: " + 450 / game.PIXELS_IN_METERS);
+		firstController = control;
     }
 
     @Override
@@ -46,7 +51,7 @@ public class MainMenuScreen implements Screen
         if(Gdx.input.isKeyPressed(Input.Keys.Z))
         {
             System.out.println("GAME START");
-            game.setScreen(new LevelScreen(game));
+            game.setScreen(new LevelScreen(game, firstController));
         }
     }
 

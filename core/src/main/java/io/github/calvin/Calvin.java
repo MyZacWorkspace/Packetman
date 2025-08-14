@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import com.badlogic.gdx.controllers.*;
+
 public class Calvin extends Game 
 {
     public SpriteBatch batch;
@@ -20,6 +22,8 @@ public class Calvin extends Game
     final float VERTICAL_VP = 780.0f;
 
     final int PIXELS_IN_METERS = 100;
+	
+	Controller firstController;
 
     public void create()
     {
@@ -32,8 +36,13 @@ public class Calvin extends Game
         
         font.setUseIntegerPositions(false);
         font.getData().setScale(hud_viewport.getMinWorldHeight() / Gdx.graphics.getHeight());
+		
+		
+		//Implement controller support first
+		firstController = Controllers.getCurrent();
+      
 
-        this.setScreen(new MainMenuScreen(this));
+        this.setScreen(new MainMenuScreen(this, firstController));
     }
 
     public void render()
