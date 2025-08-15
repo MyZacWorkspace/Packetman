@@ -39,6 +39,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     Box2DDebugRenderer b2ddr;
     OrthographicCamera orthoCamera;
     float totalElapsedTime = 0.0f;
+	
+	float fallHeight = -10.0f;
 
     //Sprites
     PlayerSprite player;
@@ -97,12 +99,21 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap,
                 1.0f / (tiledMapScale));
 				
-				
-		firstController = control;
-		  try {
-            firstController.addListener(this);
-        } catch (NullPointerException npe) {
-        }
+		
+		if(control != null)
+		{
+			
+			firstController = control;
+			try 
+			{ firstController.addListener(this);} 
+			catch (NullPointerException npe) {}
+		}
+		else
+		{
+			Controllers.addListener(this);
+		}
+		
+		
 		
 
         generateSprites();
@@ -338,14 +349,20 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
 private void updateEntities(float totalElapsedTime, float delta) {
       
+	  //Check fall
+	  
+	  if(player.getY() <= fallHeight)
+	  {
+		  endGame();
+	  }
+	  
         Rectangle playerRect = player.getBoundingRectangle();
 		Rectangle duckRect = sirDuck.getBoundingRectangle();
 		
 		//end game
 		if(playerRect.overlaps(duckRect))
 		{
-			firstController.removeListener(this);
-			game.create();
+			endGame();
 		}
 		
         Rectangle coinRect;
@@ -399,6 +416,14 @@ private void updateEntities(float totalElapsedTime, float delta) {
         }
 
     }
+	
+	//End Game
+	private void endGame()
+	{
+		firstController.removeListener(this);
+		Controllers.removeListener(this);
+		game.create();
+	}
 
     //Touching Ground Logic!
     @Override
@@ -468,6 +493,7 @@ private void updateEntities(float totalElapsedTime, float delta) {
 
         return true;
     }
+	
 
     @Override
     public boolean buttonUp(Controller controller, int buttonCode) {
@@ -491,28 +517,24 @@ private void updateEntities(float totalElapsedTime, float delta) {
     }
 
     @Override
-    public void dispose() {
-        for (int d = 0; d < gameShapes.size; d += 0)
-        {
-            gameShapes.get(d).dispose();
-        }
-        
-    }
-
-    @Override
     public void connected(Controller controller) {
 
         //FIXME allow program to work with a controller connected during this session
+		System.out.println("Connection ESTABLISHED!");
+		try {
+            controller.addListener(this);
+        } catch (NullPointerException npe) {
+        }
+		firstController = controller;
         //throw new UnsupportedOperationException("Unimplemented method 'connected'");
     }
 
     @Override
     public void disconnected(Controller controller) {
 
+		System.out.println("DISCONNECTED");
         //throw new UnsupportedOperationException("Unimplemented method 'disconnected'");
     }
-
-   
 
     @Override
     public boolean axisMoved(Controller controller, int axisCode, float value) {
@@ -521,35 +543,41 @@ private void updateEntities(float totalElapsedTime, float delta) {
         return true;
     }
 
-    //Unused
-    @Override
-    public void show() {
+	//FIXME memory optimization needed
+	//Throw out all resources and objects when necessary
+	@Override
+    public void dispose() {
+        for (int d = 0; d < gameShapes.size; d += 0)
+        {
+            gameShapes.get(d).dispose();
+        }
+        
     }
-
+	
+    //Unimplemented from Screen
     @Override
-    public void hide() {
-    }
-
+    public void show() 
+	{}
     @Override
-    public void pause() {
-    }
-
+    public void hide() 
+	{}
     @Override
-    public void resume() {
-    }
-
+    public void pause() 
+	{}
+    @Override
+    public void resume() 
+	{}
+	//Unimplemented from ContactListener
     @Override
     public void endContact(Contact contact) {
         // TODO Auto-generated method stub
         //throw new UnsupportedOperationException("Unimplemented method 'endContact'");
     }
-
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
         // TODO Auto-generated method stub
         //throw new UnsupportedOperationException("Unimplemented method 'preSolve'");
     }
-
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
         // TODO Auto-generated method stub
