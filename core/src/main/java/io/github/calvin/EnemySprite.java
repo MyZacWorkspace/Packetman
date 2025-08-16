@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
+import com.badlogic.gdx.math.Vector2;
+
 
 public class EnemySprite extends Sprite
 {
@@ -21,12 +23,18 @@ public class EnemySprite extends Sprite
     private Animation animationWalk;
 	//Function
 	private float distanceFromPlayer;
+	private final float THRESHOLD_DIST = 3.0f;
+	//Action Logical
+	boolean isFacingRight;
 	
     public EnemySprite(String enemyPath, float x, float y) 
     {
         //Get the atlas file
         atlas = new TextureAtlas(Gdx.files.internal((enemyPath)));
 		walk = atlas.findRegions("walk");
+		
+		animationWalk = new Animation<TextureAtlas.AtlasRegion>(ANIMATION_FRAME_SPEED, walk);
+		animationWalk.setPlayMode(Animation.PlayMode.LOOP);
 
         //Set bounds: position and size
 		setBounds(x, y, ((float)walk.get(0).getRegionWidth())/Calvin.PIXELS_IN_METERS * scale, 
@@ -36,17 +44,22 @@ public class EnemySprite extends Sprite
 		setRegion(walk.get(0));
     }
 
-    public void update(float elapsedTime, boolean airborne)
+    public void update(float totalElapsedTime)
     {
-        
+		if(distanceFromPlayer > THRESHOLD_DIST)
+		{
+			setRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(totalElapsedTime));
+		}
     }
 	
-	public float calculateDistanceFromPlayer()
+	public Vector2 getPositionV2()
 	{
-		//Return the distance from player using the distance formula
-		// sqrt((x2 - x1)^2 + (y2 - y1)^2)
-		return 0.0f;
+		return new Vector2(getX(), getY());
 	}
-    
+	
+	public void setDistanceFromPlayer(float distanceFromPlayer)
+	{
+		this.distanceFromPlayer = distanceFromPlayer;
+	}
 }
     

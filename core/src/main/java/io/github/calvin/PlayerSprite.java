@@ -178,4 +178,9 @@ public class PlayerSprite extends Sprite
         }
         
     }
+	
+	public Vector2 getPositionV2()
+	{
+		return new Vector2(getX(), getY());
+	}
 }

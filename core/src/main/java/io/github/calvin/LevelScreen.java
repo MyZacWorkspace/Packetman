@@ -301,7 +301,9 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
         game.batch.end();
 
-      
+		//System.out.println("distance from player: " + player.getPositionV2().dst(enemy.getPositionV2()));
+		enemy.setDistanceFromPlayer(player.getPositionV2().dst(enemy.getPositionV2()));
+	  
         updateEntities(totalElapsedTime, delta);
         
     }
@@ -418,6 +420,8 @@ private void updateEntities(float totalElapsedTime, float delta) {
                 playerBody.setLinearVelocity(-2.0f, playerBody.getLinearVelocity().y);
             }
         }
+		
+		enemy.update(totalElapsedTime);
 
     }
 	
