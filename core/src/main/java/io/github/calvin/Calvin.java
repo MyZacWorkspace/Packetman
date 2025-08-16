@@ -21,7 +21,7 @@ public class Calvin extends Game
     final float HORIZONTAL_VP = 1200.0f;
     final float VERTICAL_VP = 780.0f;
 
-    final int PIXELS_IN_METERS = 100;
+    final static int PIXELS_IN_METERS = 100;
 	
 	Controller firstController;
 

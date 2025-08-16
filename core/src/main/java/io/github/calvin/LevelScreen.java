@@ -50,6 +50,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     long score;
 	
 	Sprite sirDuck;
+	
+	EnemySprite enemy;
 
     //Sample Player World-Object
     BodyDef playerBodyDef;
@@ -132,7 +134,6 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         //hurtBox.setBounds(hurt.x, hurt.y, hurt.width, hurt.height);
 
         
-
     }
 
     public void generateSprites() {
@@ -140,7 +141,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         coins = new Array<AnimatedSprite>();
         coins.add( new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 8.0f, 4.0f));
         coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 12.0f, 4.0f));
-        coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 16.0f, 4.0f));
+        //coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 16.0f, 4.0f));
 		
 		
 		sirDuck = new Sprite(new Texture(Gdx.files.internal("sprites/sirDuck.png")));
@@ -148,6 +149,8 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 		
 		sirDuck.setPosition(25.0f, 2.3f);
 		sirDuck.setSize(sirDuck.getWidth()/game.PIXELS_IN_METERS * 5, sirDuck.getHeight()/game.PIXELS_IN_METERS * 5);
+		
+		enemy = new EnemySprite("sprites/lizard.atlas", 17.0f, 3.0f);
 
 		//System.out.println("Duck Width: " + sirDuck.getWidth());
 		//System.out.println("Duck Height: " + sirDuck.getHeight());
@@ -270,6 +273,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         }
 		
 		sirDuck.draw(game.batch);
+		enemy.draw(game.batch);
 
         // CHECK ATTACKS -- HITBOX VISUALIZATION
         //Remember Indexing starts at frame zero!
