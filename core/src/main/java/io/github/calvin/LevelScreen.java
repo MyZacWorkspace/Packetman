@@ -86,6 +86,11 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     Sprite hitBox;
     Sprite hurtBox;
+	
+	//Ground Logic
+	float[] pastPlayerVelocities;
+	int ppySize;
+	boolean hasGroundContact;
 
     public LevelScreen(final Calvin game, Controller control) {
         //As usual set a reference to the original Calvin object
@@ -116,7 +121,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 		}
 		
 		
-		
+		pastPlayerVelocities = new float[2];
 
         generateSprites();
         generateWorld();
@@ -356,7 +361,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 private void updateEntities(float totalElapsedTime, float delta) {
       
 	  //Check fall
-	  
+	  setPastPlayerYVelocities();
 	  if(player.getY() <= fallHeight)
 	  {
 		  endGame();
@@ -432,12 +437,51 @@ private void updateEntities(float totalElapsedTime, float delta) {
 		Controllers.removeListener(this);
 		game.create();
 	}
+	
+	public void setPastPlayerYVelocities()
+	{
+		float temp = 0.0f;
+		if(ppySize == 0)
+		{
+			pastPlayerVelocities[0] = playerBody.getLinearVelocity().y;
+			ppySize++;
+		}
+		if(ppySize == 1)
+		{
+			pastPlayerVelocities[1] = playerBody.getLinearVelocity().y;
+			ppySize++;
+		}
+		if(ppySize == 2)
+		{
+			pastPlayerVelocities[0] = pastPlayerVelocities[1];
+			pastPlayerVelocities[1] = playerBody.getLinearVelocity().y;
+		}
+		//System.out.println("ppySize: " + ppySize);
+		//System.out.println("Previous: " + pastPlayerVelocities[0]);
+		//System.out.println("Current: " + pastPlayerVelocities[1]);
+	}
+	
+	public boolean isPlayerGrounded()
+	{
+		//Return the abs sum of the y-velocities from the past two frames
+		//It will become zero?
+		if(ppySize == 0)
+			return false;
+		else if(ppySize == 1)
+			return pastPlayerVelocities[0] == 0.0f;
+		else
+			return pastPlayerVelocities[0] == 0.0f && pastPlayerVelocities[1] == 0.0f;
+		
+	}
 
     //Touching Ground Logic!
     @Override
     public void beginContact(Contact contact) {
+		
+		System.out.println("isPlayerGrounded ? : " + isPlayerGrounded());
 
-        if (contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture)) {
+        if (contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture)) 
+		{
             player.isAirborne = false;
             // System.out.println("HELLO!");
         }
