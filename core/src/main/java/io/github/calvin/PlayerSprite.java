@@ -36,6 +36,8 @@ public class PlayerSprite extends Sprite
     boolean isAirborne = false;
 
 	boolean isFacingRight = true;
+	
+	boolean hasPhysicalContact = false;
 
     //Actions
     boolean isStandPunchActive;

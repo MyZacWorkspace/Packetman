@@ -362,6 +362,11 @@ private void updateEntities(float totalElapsedTime, float delta) {
       
 	  //Check fall
 	  setPastPlayerYVelocities();
+	  if(player.hasPhysicalContact && isPlayerGrounded())
+	  {
+		  player.isAirborne = false;
+	  }
+	  
 	  if(player.getY() <= fallHeight)
 	  {
 		  endGame();
@@ -478,17 +483,36 @@ private void updateEntities(float totalElapsedTime, float delta) {
     @Override
     public void beginContact(Contact contact) {
 		
-		System.out.println("isPlayerGrounded ? : " + isPlayerGrounded());
+		//System.out.println("isPlayerGrounded ? : " + isPlayerGrounded());
 
         if (contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture)) 
 		{
-            player.isAirborne = false;
+            //player.isAirborne = false;
             // System.out.println("HELLO!");
+			
+			//When player touches another object
+			player.hasPhysicalContact = true;
         }
         // throw new UnsupportedOperationException("Unimplemented method
         // 'beginContact'");
+		
+		System.out.println(
     }
 
+	@Override
+    public void endContact(Contact contact) {
+        // TODO Auto-generated method stub
+        //throw new UnsupportedOperationException("Unimplemented method 'endContact'");
+		if (contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture)) 
+		{
+            //player.isAirborne = false;
+            // System.out.println("HELLO!");
+			
+			//When player touches another object
+			player.hasPhysicalContact = false;
+        }
+    }
+	
     //Controller Support
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
@@ -531,7 +555,7 @@ private void updateEntities(float totalElapsedTime, float delta) {
                 
         }
 
-        if (!player.isAirborne) {
+        if (isPlayerGrounded() && player.hasPhysicalContact) {
             if (controller.getButton(controller.getMapping().buttonA)) {
                 player.isJumping = true;
             }
@@ -620,11 +644,7 @@ private void updateEntities(float totalElapsedTime, float delta) {
     public void resume() 
 	{}
 	//Unimplemented from ContactListener
-    @Override
-    public void endContact(Contact contact) {
-        // TODO Auto-generated method stub
-        //throw new UnsupportedOperationException("Unimplemented method 'endContact'");
-    }
+   
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
         // TODO Auto-generated method stub
