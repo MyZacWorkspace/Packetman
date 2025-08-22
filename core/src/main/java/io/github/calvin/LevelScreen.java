@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;
 
 import com.badlogic.gdx.physics.box2d.*;
+
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -358,24 +359,18 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         }
     }
 
-private void updateEntities(float totalElapsedTime, float delta) {
+    private void updateEntities(float totalElapsedTime, float delta) 
+    {
       
-	  //Check fall
-	  setPastPlayerYVelocities();
-	  if(player.hasPhysicalContact && isPlayerGrounded())
-	  {
-		  player.isAirborne = false;
-	  }
-	  
-	  if(player.getY() <= fallHeight)
-	  {
-		  endGame();
-	  }
+        //End conditions
+	    if(player.getY() <= fallHeight)
+	    {
+		    endGame();
+	    }
 	  
         Rectangle playerRect = player.getBoundingRectangle();
-		Rectangle duckRect = sirDuck.getBoundingRectangle();
-		
-		//end game
+        Rectangle duckRect = sirDuck.getBoundingRectangle();
+        
 		if(playerRect.overlaps(duckRect))
 		{
 			endGame();
@@ -414,25 +409,32 @@ private void updateEntities(float totalElapsedTime, float delta) {
         {
             coin.update(totalElapsedTime);
         }
-        player.update(totalElapsedTime, delta);
-        
 
-        if (player.isJumping) {
+        //Player Movement!
+        // Check fall
+        setPastPlayerYVelocities();
+        if (player.hasPhysicalContact && isPlayerGrounded()) {
+            player.isAirborne = false;
+        }
+
+        if (player.isJumping) 
+        {
             playerBody.applyForceToCenter(0.0f, 110.0f, true);
             player.isJumping = false;
             player.isAirborne = true;
         }
 
-        if (!player.isAirborne) {
-            if (player.isRight) {
+        if (!player.isAirborne) 
+        {
+            if (player.isInputRight) {
                 playerBody.setLinearVelocity(2.0f, playerBody.getLinearVelocity().y);
-            } else if (player.isLeft) {
+            } else if (player.isInputLeft) {
                 playerBody.setLinearVelocity(-2.0f, playerBody.getLinearVelocity().y);
             }
         }
+        player.update(totalElapsedTime, delta);
 		
-		enemy.update(totalElapsedTime);
-
+        enemy.update(totalElapsedTime);
     }
 	
 	//End Game
@@ -484,6 +486,20 @@ private void updateEntities(float totalElapsedTime, float delta) {
     public void beginContact(Contact contact) {
 		
 		//System.out.println("isPlayerGrounded ? : " + isPlayerGrounded());
+		
+		
+        WorldManifold wm = contact.getWorldManifold();
+        Vector2[] v2wm = wm.getPoints();
+
+        System.out.println("Calvin's Feet: " + player.getPositionV2().y);
+        for (Vector2 point : v2wm)
+        {
+            System.out.println("Point X: " + point.x);
+            System.out.println("Point Y: " + point.y);
+        }
+		//contact.getManifold();
+		//ManifoldPoint mannyPoints = manny.points;
+		//System.out.println("Manifold Point at Index 0: " + mannyPoints[0]);
 
         if (contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture)) 
 		{
@@ -496,7 +512,7 @@ private void updateEntities(float totalElapsedTime, float delta) {
         // throw new UnsupportedOperationException("Unimplemented method
         // 'beginContact'");
 		
-		System.out.println(
+		System.out.println(contact);;
     }
 
 	@Override
@@ -562,9 +578,9 @@ private void updateEntities(float totalElapsedTime, float delta) {
         }
 
         if (controller.getButton(controller.getMapping().buttonDpadRight)) {
-            player.isRight = true;
+            player.isInputRight = true;
         } else if (controller.getButton(controller.getMapping().buttonDpadLeft)) {
-            player.isLeft = true;
+            player.isInputLeft = true;
         }
 
         return true;
@@ -577,9 +593,9 @@ private void updateEntities(float totalElapsedTime, float delta) {
         controller = firstController;
 
         if (buttonCode == controller.getMapping().buttonDpadRight) {
-            player.isRight = false;
+            player.isInputRight = false;
         } else if (buttonCode == controller.getMapping().buttonDpadLeft) {
-            player.isLeft = false;
+            player.isInputLeft = false;
         }
 
         // throw new UnsupportedOperationException("Unimplemented method 'buttonUp'");
