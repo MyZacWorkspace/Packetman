@@ -34,7 +34,8 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 
-public class LevelScreen implements Screen, ControllerListener, ContactListener {
+public class LevelScreen implements Screen, ControllerListener 
+ {
     Calvin game;
     World world;
     Box2DDebugRenderer b2ddr;
@@ -61,14 +62,12 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     FixtureDef playerFixtureDef;
     Fixture playerFixture;
 
-    //Sample Ball
-    /*
-    BodyDef bodyDef;
-    Body body;
-    CircleShape circle;
-    FixtureDef fixtureDef;
-    Fixture fixture;
-    */
+    //Sample Enemy
+    BodyDef enemyBodyDef;
+    Body enemyBody;
+    PolygonShape enemyShape;
+    FixtureDef enemyFixtureDef;
+    Fixture enemyFixture;
 
     //Sample Game World-Objects (Physics)
     Array<BodyDef> gameObjectBodyDefs;
@@ -87,11 +86,6 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     Sprite hitBox;
     Sprite hurtBox;
-	
-	//Ground Logic
-	float[] pastPlayerVelocities;
-	int ppySize;
-	boolean hasGroundContact;
 
     public LevelScreen(final Calvin game, Controller control) {
         //As usual set a reference to the original Calvin object
@@ -122,50 +116,34 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 		}
 		
 		
-		pastPlayerVelocities = new float[2];
 
         generateSprites();
         generateWorld();
 
         
-        //Rectangle hit = new Rectangle(1.0f, 1.0f,
-                //10.0f, 5.0f);
+        //FIXME just for hitbox visualization
         hitBox = new Sprite(new Texture(Gdx.files.internal("Hit.png")));
         hitBox.setAlpha(0.50f);
-        //hitBox.setBounds(hit.x, hit.y, hit.width, hit.height);
-        //Rectangle hurt = new Rectangle(10.0f, 1.0f,
-                //10.0f, 5.0f);
-        //hurtBox = new Sprite(new Texture(Gdx.files.internal("Hurt.png")));
-        //hurtBox.setAlpha(0.50f);
-        //hurtBox.setBounds(hurt.x, hurt.y, hurt.width, hurt.height);
-
-        
     }
 
-    public void generateSprites() {
+    public void generateSprites() 
+    {
         player = new PlayerSprite(5.0f, 5.0f);
         coins = new Array<AnimatedSprite>();
-        coins.add( new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 8.0f, 4.0f));
-        coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 12.0f, 4.0f));
+        coins.add( new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 8.0f, 3.0f));
+        coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 12.0f, 3.0f));
         //coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 16.0f, 4.0f));
 		
 		
 		sirDuck = new Sprite(new Texture(Gdx.files.internal("sprites/sirDuck.png")));
 		//sirDuck.setBounds(0.0f, 0.0f, sirDuck.getWidth()/game.PIXELS_IN_METERS, sirDuck.getHeight()/game.PIXELS_IN_METERS);
-		
 		sirDuck.setPosition(25.0f, 2.3f);
 		sirDuck.setSize(sirDuck.getWidth()/game.PIXELS_IN_METERS * 5, sirDuck.getHeight()/game.PIXELS_IN_METERS * 5);
-		
-		enemy = new EnemySprite("sprites/lizard.atlas", 17.0f, 3.0f);
-
-		//System.out.println("Duck Width: " + sirDuck.getWidth());
-		//System.out.println("Duck Height: " + sirDuck.getHeight());
-        //System.out.println(orthoCamera.position.x);
-        //System.out.println(orthoCamera.position.y);
-        //System.out.println(orthoCamera.position.z);
+		enemy = new EnemySprite("sprites/lizard.atlas", 0.0f, 3.0f);
     }
 
-    public void generateWorld() {
+    public void generateWorld() 
+    {
         world = new World(new Vector2(0, -10), true);
 
         MapProperties globalMapProperties = tiledMap.getProperties();
@@ -204,29 +182,6 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
             gameBodies.get(o).createFixture(gameShapes.get(o), 0.0f);    
         }
 
-
-       
-        //Sample World-Object
-        /*
-        bodyDef = new BodyDef();
-        bodyDef.type = BodyType.DynamicBody;
-        bodyDef.position.set(1, 5);
-        body = world.createBody(bodyDef);
-        
-        CircleShape circle = new CircleShape();
-        circle.setRadius(15f / (game.PIXELS_IN_METERS / 2));
-        
-        fixtureDef = new FixtureDef();
-        fixtureDef.shape = circle;
-        fixtureDef.density = 0.5f;
-        fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.6f;
-        fixture = body.createFixture(fixtureDef);
-        circle.dispose();
-        
-        body.applyForceToCenter(3f, 0.0f, true);
-        */
-
         //Sample Player World-Object
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyType.DynamicBody;
@@ -246,10 +201,25 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         playerFixtureDef.restitution = 0.0f;
         playerFixture = playerBody.createFixture(playerFixtureDef);
         playerShape.dispose();
+        
+        //Enemy Shape
+        enemyBodyDef = new BodyDef();
+        enemyBodyDef.type = BodyType.DynamicBody;
+        enemyBodyDef.position.set(enemy.getX() , enemy.getY());
+        enemyBody = world.createBody(enemyBodyDef);
+        enemyBody.setFixedRotation(true);
 
-        world.setContactListener(this);
+        enemyShape = new PolygonShape();
+        enemyShape.setAsBox(enemy.getWidth()  / 2, enemy.getHeight() / 2);
+        enemyFixtureDef = new FixtureDef();
+        enemyFixtureDef.shape = enemyShape;
+        enemyFixtureDef.density = 0.77f;
+        enemyFixtureDef.friction = 0.5f;
+        enemyFixtureDef.restitution = 0.0f;
+        enemyFixture = enemyBody.createFixture(enemyFixtureDef);
+        enemyShape.dispose();
+
         b2ddr = new Box2DDebugRenderer();
-
     }
 
   
@@ -314,11 +284,15 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         
     }
 
-    private void renderWorld(float delta) {
+    private void renderWorld(float delta) 
+    {
         world.step(1 / 60f, 6, 2);
 
+        //FIXME simplify handling player scale
         player.setPosition(playerBody.getPosition().x - player.getWidth() / 2 / 25,
                 playerBody.getPosition().y - player.getHeight() / 2 / 25);
+        enemy.setPosition(enemyBody.getPosition().x - enemy.getWidth()/2,
+                enemyBody.getPosition().y - enemy.getHeight()/2);
         b2ddr.render(world, orthoCamera.combined); // Matrix4 debug matrix
     }
     private void scrollCamera()
@@ -361,7 +335,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 
     private void updateEntities(float totalElapsedTime, float delta) 
     {
-      
+        boolean isPlayerToTheRightOfEnemy;
         //End conditions
 	    if(player.getY() <= fallHeight)
 	    {
@@ -410,31 +384,42 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
             coin.update(totalElapsedTime);
         }
 
-        //Player Movement!
-        // Check fall
-        setPastPlayerYVelocities();
-        if (player.hasPhysicalContact && isPlayerGrounded()) {
+        //Check Airborne State
+        //OR maybe turning around in air is ok?
+        //if not will have to fix below if statement for rounding error
+        /*
+        if (playerBody.getLinearVelocity().y != 0) 
+        {
             player.isAirborne = false;
         }
-
-        if (player.isJumping) 
+        else
         {
-            playerBody.applyForceToCenter(0.0f, 110.0f, true);
-            player.isJumping = false;
             player.isAirborne = true;
         }
+        */
 
         if (!player.isAirborne) 
         {
-            if (player.isInputRight) {
+            if (player.isInputRight) 
+            {
                 playerBody.setLinearVelocity(2.0f, playerBody.getLinearVelocity().y);
-            } else if (player.isInputLeft) {
+            } else if (player.isInputLeft) 
+            {
                 playerBody.setLinearVelocity(-2.0f, playerBody.getLinearVelocity().y);
             }
         }
         player.update(totalElapsedTime, delta);
-		
-        enemy.update(totalElapsedTime);
+
+        if(playerBody.getPosition().x < enemyBody.getPosition().x)
+        {
+            enemyBody.setLinearVelocity(-2.0f, enemyBody.getLinearVelocity().y);
+        }
+        else
+        {
+            enemyBody.setLinearVelocity(2.0f, enemyBody.getLinearVelocity().y);
+        }
+    
+        enemy.update(totalElapsedTime, playerBody.getWorldCenter());
     }
 	
 	//End Game
@@ -445,89 +430,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
 		game.create();
 	}
 	
-	public void setPastPlayerYVelocities()
-	{
-		float temp = 0.0f;
-		if(ppySize == 0)
-		{
-			pastPlayerVelocities[0] = playerBody.getLinearVelocity().y;
-			ppySize++;
-		}
-		if(ppySize == 1)
-		{
-			pastPlayerVelocities[1] = playerBody.getLinearVelocity().y;
-			ppySize++;
-		}
-		if(ppySize == 2)
-		{
-			pastPlayerVelocities[0] = pastPlayerVelocities[1];
-			pastPlayerVelocities[1] = playerBody.getLinearVelocity().y;
-		}
-		//System.out.println("ppySize: " + ppySize);
-		//System.out.println("Previous: " + pastPlayerVelocities[0]);
-		//System.out.println("Current: " + pastPlayerVelocities[1]);
-	}
 	
-	public boolean isPlayerGrounded()
-	{
-		//Return the abs sum of the y-velocities from the past two frames
-		//It will become zero?
-		if(ppySize == 0)
-			return false;
-		else if(ppySize == 1)
-			return pastPlayerVelocities[0] == 0.0f;
-		else
-			return pastPlayerVelocities[0] == 0.0f && pastPlayerVelocities[1] == 0.0f;
-		
-	}
-
-    //Touching Ground Logic!
-    @Override
-    public void beginContact(Contact contact) {
-		
-		//System.out.println("isPlayerGrounded ? : " + isPlayerGrounded());
-		
-		
-        WorldManifold wm = contact.getWorldManifold();
-        Vector2[] v2wm = wm.getPoints();
-
-        System.out.println("Calvin's Feet: " + player.getPositionV2().y);
-        for (Vector2 point : v2wm)
-        {
-            System.out.println("Point X: " + point.x);
-            System.out.println("Point Y: " + point.y);
-        }
-		//contact.getManifold();
-		//ManifoldPoint mannyPoints = manny.points;
-		//System.out.println("Manifold Point at Index 0: " + mannyPoints[0]);
-
-        if (contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture)) 
-		{
-            //player.isAirborne = false;
-            // System.out.println("HELLO!");
-			
-			//When player touches another object
-			player.hasPhysicalContact = true;
-        }
-        // throw new UnsupportedOperationException("Unimplemented method
-        // 'beginContact'");
-		
-		System.out.println(contact);;
-    }
-
-	@Override
-    public void endContact(Contact contact) {
-        // TODO Auto-generated method stub
-        //throw new UnsupportedOperationException("Unimplemented method 'endContact'");
-		if (contact.getFixtureA().equals(playerFixture) || contact.getFixtureB().equals(playerFixture)) 
-		{
-            //player.isAirborne = false;
-            // System.out.println("HELLO!");
-			
-			//When player touches another object
-			player.hasPhysicalContact = false;
-        }
-    }
 	
     //Controller Support
     @Override
@@ -542,47 +445,29 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         {
             if (!player.isStandPunchActive) //When the punch is not active
             {
-				//The action direction is dependent on the direction being faced
+                //The action direction is dependent on the direction being faced
                 player.isActionFacingRight = Boolean.valueOf(player.isFacingRight);
-				
-				//System.out.println("wasActionFacingRight: " + wasActionFacingRight);
-				//System.out.println("player.isActionFacingRight: " + player.isActionFacingRight);
-				if(wasActionFacingRight != player.isActionFacingRight) 
-				{
-					if(!player.isActionFacingRight)
-					{
-						sampleHitBox.x *= -1;
-						sampleHitBox.x -= sampleHitBox.width;
-					}
-					else
-					{
-						sampleHitBox.x += sampleHitBox.width;
-						sampleHitBox.x *= -1;
-					}
-					
-				}
-				
-				//System.out.println("HitBox X: " + sampleHitBox.x);
-				//System.out.println("HitBox Width: " + sampleHitBox.width);
-			
-				//System.out.println("Player starts action right: " + player.isFacingRight);
+                if (wasActionFacingRight != player.isActionFacingRight) {
+                    if (!player.isActionFacingRight) {
+                        sampleHitBox.x *= -1;
+                        sampleHitBox.x -= sampleHitBox.width;
+                    } else {
+                        sampleHitBox.x += sampleHitBox.width;
+                        sampleHitBox.x *= -1;
+                    }
+
+                }
                 player.isStandPunchActive = true;
             }
-                
         }
-
-        if (isPlayerGrounded() && player.hasPhysicalContact) {
-            if (controller.getButton(controller.getMapping().buttonA)) {
-                player.isJumping = true;
-            }
-        }
-
-        if (controller.getButton(controller.getMapping().buttonDpadRight)) {
+        
+        if(controller.getButton(controller.getMapping().buttonDpadRight))
+        {
             player.isInputRight = true;
-        } else if (controller.getButton(controller.getMapping().buttonDpadLeft)) {
+        }
+        else if (controller.getButton(controller.getMapping().buttonDpadLeft)) {
             player.isInputLeft = true;
         }
-
         return true;
     }
 	
@@ -643,7 +528,6 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
         {
             gameShapes.get(d).dispose();
         }
-        
     }
 	
     //Unimplemented from Screen
@@ -659,16 +543,4 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener 
     @Override
     public void resume() 
 	{}
-	//Unimplemented from ContactListener
-   
-    @Override
-    public void preSolve(Contact contact, Manifold oldManifold) {
-        // TODO Auto-generated method stub
-        //throw new UnsupportedOperationException("Unimplemented method 'preSolve'");
-    }
-    @Override
-    public void postSolve(Contact contact, ContactImpulse impulse) {
-        // TODO Auto-generated method stub
-        //throw new UnsupportedOperationException("Unimplemented method 'postSolve'");
-    }
 }

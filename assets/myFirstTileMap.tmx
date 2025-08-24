@@ -13,7 +13,5 @@
  </layer>
  <objectgroup id="3" name="Object Layer 1">
   <object id="2" x="0.181818" y="928.091" width="1024.82" height="95.9091"/>
-  <object id="10" x="927.75" y="864.25" width="32.25" height="64"/>
-  <object id="11" x="831.75" y="895.75" width="32.75" height="32.25"/>
  </objectgroup>
 </map>

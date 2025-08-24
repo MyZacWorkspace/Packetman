@@ -33,12 +33,8 @@ public class PlayerSprite extends Sprite
     boolean isFacingRight = true;
     //Value will stay fixed for the duration of the current action, like punching
     boolean isActionFacingRight = true;
-
-    //Jumping!
-    boolean isJumping = false;
+    //Whether they are airborne
     boolean isAirborne = false;
-
-	boolean hasPhysicalContact = false;
 
     //Actions
     boolean isStandPunchActive;

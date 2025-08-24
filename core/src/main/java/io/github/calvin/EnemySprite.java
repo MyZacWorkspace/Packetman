@@ -44,11 +44,20 @@ public class EnemySprite extends Sprite
 		setRegion(walk.get(0));
     }
 
-    public void update(float totalElapsedTime)
+    public void update(float totalElapsedTime, Vector2 playerPos)
     {
-		if(distanceFromPlayer > THRESHOLD_DIST)
+		TextureRegion currentRegion;
+		if(distanceFromPlayer < THRESHOLD_DIST)
 		{
-			setRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(totalElapsedTime));
+			if(playerPos.x > this.getX())
+				setRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(totalElapsedTime));
+			else
+			{
+				currentRegion = new TextureRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(totalElapsedTime));
+				currentRegion.flip(true, false);
+				setRegion(currentRegion); 
+			}
+
 		}
     }
 	
