@@ -256,16 +256,17 @@ public class LevelScreen implements Screen, ControllerListener
         //Have a mutable list of hitbox sprites, and update these according to the current index in the literal and graphical hitbox, then draw. 
         //Do for all.
         if (player.isStandPunchActive && player.currentFrameNumber == 4) {
-            for (Rectangle thisBox : player.punch.getHitboxes(4))
-            {
-				
-				//thisBox.x *= -1;
-				//thisBox.y *= -1;
+            for (Rectangle thisBox : player.punch.getHitboxes(4)) {
+
+                //thisBox.x *= -1;
+                //thisBox.y *= -1;
                 hitBox.setBounds(thisBox.x + playerBody.getWorldCenter().x, thisBox.y + playerBody.getWorldCenter().y,
                         thisBox.width, thisBox.height);
                 hitBox.draw(game.batch);
             }
         }
+        
+        
         //hitBox.draw(game.batch);
         //hurtBox.draw(game.batch);
 
@@ -276,9 +277,6 @@ public class LevelScreen implements Screen, ControllerListener
         
 
         game.batch.end();
-
-		//System.out.println("distance from player: " + player.getPositionV2().dst(enemy.getPositionV2()));
-		enemy.setDistanceFromPlayer(player.getPositionV2().dst(enemy.getPositionV2()));
 	  
         updateEntities(totalElapsedTime, delta);
         
@@ -384,20 +382,6 @@ public class LevelScreen implements Screen, ControllerListener
             coin.update(totalElapsedTime);
         }
 
-        //Check Airborne State
-        //OR maybe turning around in air is ok?
-        //if not will have to fix below if statement for rounding error
-        /*
-        if (playerBody.getLinearVelocity().y != 0) 
-        {
-            player.isAirborne = false;
-        }
-        else
-        {
-            player.isAirborne = true;
-        }
-        */
-
         if (!player.isAirborne) 
         {
             if (player.isInputRight) 
@@ -410,14 +394,21 @@ public class LevelScreen implements Screen, ControllerListener
         }
         player.update(totalElapsedTime, delta);
 
-        if(playerBody.getPosition().x < enemyBody.getPosition().x)
+        // System.out.println("distance from player: " +
+        // player.getPositionV2().dst(enemy.getPositionV2()));
+        enemy.setDistanceFromPlayer(player.getPositionV2().dst(enemy.getPositionV2()));
+        //FIXME make this a little more optimal
+        if (enemy.getDistanceFromPlayer() > 2.0f)
         {
-            enemyBody.setLinearVelocity(-2.0f, enemyBody.getLinearVelocity().y);
+            if (playerBody.getPosition().x < enemyBody.getPosition().x) {
+                isPlayerToTheRightOfEnemy = false;
+                enemyBody.setLinearVelocity(-0.5f, enemyBody.getLinearVelocity().y);
+            } else {
+                isPlayerToTheRightOfEnemy = false;
+                enemyBody.setLinearVelocity(0.5f, enemyBody.getLinearVelocity().y);
+            }
         }
-        else
-        {
-            enemyBody.setLinearVelocity(2.0f, enemyBody.getLinearVelocity().y);
-        }
+       
     
         enemy.update(totalElapsedTime, playerBody.getWorldCenter());
     }

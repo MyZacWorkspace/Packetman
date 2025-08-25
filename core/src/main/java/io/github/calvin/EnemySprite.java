@@ -17,13 +17,17 @@ public class EnemySprite extends Sprite
 	private TextureAtlas atlas;
 	private float scale = 5.0f;
 	//Frames
-    private Array<TextureAtlas.AtlasRegion> walk;
+	private Array<TextureAtlas.AtlasRegion> walk;
+	private Array<TextureAtlas.AtlasRegion> bite;
 	//Animation
 	private final float ANIMATION_FRAME_SPEED = 0.09f;
-    private Animation animationWalk;
+	private Animation animationWalk;
+	private Animation animationBite;
+	//FrameData
+	ActionFrameData actionBite;
 	//Function
 	private float distanceFromPlayer;
-	private final float THRESHOLD_DIST = 3.0f;
+	private final float THRESHOLD_DIST = 2.0f;
 	//Action Logical
 	boolean isFacingRight;
 	
@@ -36,6 +40,13 @@ public class EnemySprite extends Sprite
 		animationWalk = new Animation<TextureAtlas.AtlasRegion>(ANIMATION_FRAME_SPEED, walk);
 		animationWalk.setPlayMode(Animation.PlayMode.LOOP);
 
+		bite = atlas.findRegions("bite");
+		animationBite = new Animation<TextureAtlas.AtlasRegion>(ANIMATION_FRAME_SPEED, bite);
+		animationBite.setPlayMode(Animation.PlayMode.LOOP);
+		
+		actionBite = new ActionFrameData(bite.size);
+		actionBite.appendHitbox(6, 0.2f, 0.1f, 1.0f, 0.5f);
+
         //Set bounds: position and size
 		setBounds(x, y, ((float)walk.get(0).getRegionWidth())/Calvin.PIXELS_IN_METERS * scale, 
 						((float)walk.get(0).getRegionHeight())/Calvin.PIXELS_IN_METERS * scale);
@@ -47,17 +58,28 @@ public class EnemySprite extends Sprite
     public void update(float totalElapsedTime, Vector2 playerPos)
     {
 		TextureRegion currentRegion;
-		if(distanceFromPlayer < THRESHOLD_DIST)
+		if(distanceFromPlayer > THRESHOLD_DIST)
 		{
-			if(playerPos.x > this.getX())
+			if (playerPos.x > this.getX())
 				setRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(totalElapsedTime));
-			else
-			{
-				currentRegion = new TextureRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(totalElapsedTime));
+			else {
+				currentRegion = new TextureRegion(
+						(TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(totalElapsedTime));
 				currentRegion.flip(true, false);
-				setRegion(currentRegion); 
+				setRegion(currentRegion);
 			}
 
+		}
+		else
+		{
+			if (playerPos.x > this.getX())
+				setRegion((TextureAtlas.AtlasRegion) animationBite.getKeyFrame(totalElapsedTime));
+			else {
+				currentRegion = new TextureRegion(
+						(TextureAtlas.AtlasRegion) animationBite.getKeyFrame(totalElapsedTime));
+				currentRegion.flip(true, false);
+				setRegion(currentRegion);
+			}
 		}
     }
 	
@@ -69,6 +91,11 @@ public class EnemySprite extends Sprite
 	public void setDistanceFromPlayer(float distanceFromPlayer)
 	{
 		this.distanceFromPlayer = distanceFromPlayer;
+	}
+
+	public float getDistanceFromPlayer()
+	{
+		return this.distanceFromPlayer;
 	}
 }
     
