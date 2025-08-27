@@ -30,6 +30,8 @@ public class EnemySprite extends Sprite
 	private final float THRESHOLD_DIST = 2.0f;
 	//Action Logical
 	boolean isFacingRight;
+
+	int frameIndex;
 	
     public EnemySprite(String enemyPath, float x, float y) 
     {
@@ -60,6 +62,7 @@ public class EnemySprite extends Sprite
 		TextureRegion currentRegion;
 		if(distanceFromPlayer > THRESHOLD_DIST)
 		{
+			frameIndex =  animationWalk.getKeyFrameIndex(totalElapsedTime);
 			if (playerPos.x > this.getX())
 				setRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(totalElapsedTime));
 			else {
@@ -72,6 +75,7 @@ public class EnemySprite extends Sprite
 		}
 		else
 		{
+			frameIndex = animationBite.getKeyFrameIndex(totalElapsedTime);
 			if (playerPos.x > this.getX())
 				setRegion((TextureAtlas.AtlasRegion) animationBite.getKeyFrame(totalElapsedTime));
 			else {

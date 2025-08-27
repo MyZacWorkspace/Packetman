@@ -85,6 +85,7 @@ public class LevelScreen implements Screen, ControllerListener
     float tiledMapScale;
 
     Sprite hitBox;
+    Sprite hitBox2;
     Sprite hurtBox;
 
     public LevelScreen(final Calvin game, Controller control) {
@@ -124,6 +125,8 @@ public class LevelScreen implements Screen, ControllerListener
         //FIXME just for hitbox visualization
         hitBox = new Sprite(new Texture(Gdx.files.internal("Hit.png")));
         hitBox.setAlpha(0.50f);
+        hitBox2 = new Sprite(new Texture(Gdx.files.internal("Hurt.png")));
+        hitBox2.setAlpha(0.50f);
     }
 
     public void generateSprites() 
@@ -265,7 +268,15 @@ public class LevelScreen implements Screen, ControllerListener
                 hitBox.draw(game.batch);
             }
         }
-        
+
+        //System.out.println(enemy.frameIndex);
+
+        for(Rectangle thisBox : enemy.actionBite.getHitboxes(enemy.frameIndex))
+        {
+            hitBox.setBounds(thisBox.x + enemyBody.getWorldCenter().x, thisBox.y + enemyBody.getWorldCenter().y,
+                    thisBox.width, thisBox.height);
+            hitBox.draw(game.batch);
+        }        
         
         //hitBox.draw(game.batch);
         //hurtBox.draw(game.batch);
