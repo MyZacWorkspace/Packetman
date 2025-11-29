@@ -25,6 +25,10 @@ public class PlayerSprite extends Sprite
     Vector2 initialPosition = null;
     Vector2 recentPosition = null;
 
+    //For jumping logic
+    JumpStates jumpRecog = JumpStates.NONE;
+    boolean isAllowedToJump = false;
+
 
     //See if input is right or left (could never be both at the same time!)
     boolean isInputRight = false;

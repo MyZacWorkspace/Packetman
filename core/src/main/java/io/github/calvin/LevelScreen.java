@@ -393,8 +393,31 @@ public class LevelScreen implements Screen, ControllerListener
             coin.update(totalElapsedTime);
         }
 
-        if (!player.isAirborne) 
+        //Run through Automata
+        //FIXME -- Be careful of comparing floating points
+        //And rounding with doubles
+        //Only run through the automata if the final state has not been reached
+        if (player.jumpRecog != JumpStates.TWO_F)
         {
+            float currentPlayerY_Velocity = playerBody.getLinearVelocity().y;
+            if (currentPlayerY_Velocity != 0.0f) {
+                player.jumpRecog = JumpStates.NONE;
+            } else if (currentPlayerY_Velocity == 0) //Zero y_velocity found
+            {
+                if (player.jumpRecog == JumpStates.NONE)
+                    player.jumpRecog = JumpStates.ONCE;
+                else if (player.jumpRecog == JumpStates.ONCE)
+                {
+                    player.jumpRecog = JumpStates.TWO_F; // The final state
+                    player.isAllowedToJump = true;
+                }
+            }
+        }
+
+
+
+        if (player.jumpRecog == JumpStates.TWO_F) //This means you are grounded
+        { // You will always remain in the NONE state in the air!
             if (player.isInputRight) 
             {
                 playerBody.setLinearVelocity(2.0f, playerBody.getLinearVelocity().y);
@@ -439,6 +462,16 @@ public class LevelScreen implements Screen, ControllerListener
     public boolean buttonDown(Controller controller, int buttonCode) {
 
         controller = firstController;
+
+        //Jump Button
+        if (controller.getButton(controller.getMapping().buttonA) && player.isAllowedToJump)
+        {
+            playerBody.applyForceToCenter(0.0f, 40.0f, false);
+            player.isAllowedToJump = false;
+            player.jumpRecog = JumpStates.NONE; //Look for the pattern once more
+        }
+
+
 		//FIXME need to check all hit and hurtBoxes
 		Rectangle sampleHitBox = player.punch.getHitboxes(4).get(0);
 		boolean wasActionFacingRight = Boolean.valueOf(player.isActionFacingRight);
