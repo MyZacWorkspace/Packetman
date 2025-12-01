@@ -1,0 +1,26 @@
+WorldWideWeb-Sheet.png
+size: 90, 30
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+idle
+    rotate: false
+    xy: 0, 0
+    size: 30, 30
+    orig: 30, 30
+    offset: 0, 0
+    index: 0
+idle
+    rotate: false
+    xy: 30, 0
+    size: 30, 30
+    orig: 30, 30
+    offset: 0, 0
+    index: 1
+idle
+    rotate: false
+    xy: 60, 0
+    size: 30, 30
+    orig: 30, 30
+    offset: 0, 0
+    index: 2
