@@ -1,0 +1,138 @@
+packetman-Sheet.png
+size: 760 , 30
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+idle
+    rotate: false
+    xy: 0, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 0
+walk
+    rotate: false
+    xy: 40, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 1
+walk
+    rotate: false
+    xy: 80, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 2
+walk
+    rotate: false
+    xy: 120, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 3
+walk
+    rotate: false
+    xy: 160, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 4
+walk
+    rotate: false
+    xy: 200, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 5
+walk
+    rotate: false
+    xy: 240, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 6
+jump
+    rotate: false
+    xy: 280, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 7
+jump
+    rotate: false
+    xy: 320, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 8
+jump
+    rotate: false
+    xy: 360, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 9
+jump
+    rotate: false
+    xy: 400, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 10
+jump
+    rotate: false
+    xy: 440, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 11
+defeat
+    rotate: false
+    xy: 480, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 12
+defeat
+    rotate: false
+    xy: 520, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 13
+defeat
+    rotate: false
+    xy: 560, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 14
+defeat
+    rotate: false
+    xy: 600, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 15
+defeat
+    rotate: false
+    xy: 640, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 16
+defeat
+    rotate: false
+    xy: 680, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 17
+defeat
+    rotate: false
+    xy: 720, 0
+    size: 40, 30
+    orig: 40, 30
+    offset: 0, 0
+    index: 18

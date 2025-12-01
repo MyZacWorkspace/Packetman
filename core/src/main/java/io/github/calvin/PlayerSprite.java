@@ -29,6 +29,11 @@ public class PlayerSprite extends Sprite
     JumpStates jumpRecog = JumpStates.NONE;
     boolean isAllowedToJump = false;
 
+    // Jump Action
+    private Array<TextureAtlas.AtlasRegion> jumpFrames;
+    private Animation jumpAnimation;
+    boolean isJumpAnimationActive;
+    float jumpAnimationTime;
 
     //See if input is right or left (could never be both at the same time!)
     boolean isInputRight = false;
@@ -40,20 +45,11 @@ public class PlayerSprite extends Sprite
     //Whether they are airborne
     boolean isAirborne = false;
 
-    //Actions
-    boolean isStandPunchActive;
-    private Array<TextureAtlas.AtlasRegion> standPunch;
-    private Animation standPunchAnimation;
-    float standPunchAnimationTime;
-
-    //THE NEW PUNCH
-    ActionFrameData punch;
-
     int currentFrameNumber;
 
     public PlayerSprite(float x, float y)
     {
-        atlas = new TextureAtlas(Gdx.files.internal("sprites/calvinResprite.atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("sprites/packetman.atlas"));
 
         walk = atlas.findRegions("walk");
 
@@ -68,16 +64,18 @@ public class PlayerSprite extends Sprite
         animationWalk = new Animation<TextureAtlas.AtlasRegion>(ANIMATION_FRAME_SPEED, walk);
         animationWalk.setPlayMode(Animation.PlayMode.LOOP);
         
-        //Action Animations
-        isStandPunchActive = false;
-        standPunch = atlas.findRegions("stand_punch");
-        standPunchAnimation = new Animation<TextureAtlas.AtlasRegion>(0.04f, standPunch);
-        standPunchAnimation.setPlayMode(Animation.PlayMode.NORMAL);
-        standPunchAnimationTime = 0.0f;
+        //Jumping Animation
+        isJumpAnimationActive = false;
+        jumpFrames = atlas.findRegions("jump");
+        jumpAnimation = new Animation<TextureAtlas.AtlasRegion>(0.09f, jumpFrames);
+        jumpAnimation.setPlayMode(Animation.PlayMode.NORMAL);
+        jumpAnimationTime = 0.0f;
 
         //Frame Data
-        punch = new ActionFrameData(standPunch.size);
+        /*
+        punch = new ActionFrameData(jumpFrames.size);
         punch.appendHitbox(4, 0.2f, 0.1f, 1.0f, 0.5f);
+        */
     }
 
     public void update(float totalElapsedTime, float delta)
@@ -85,28 +83,27 @@ public class PlayerSprite extends Sprite
         TextureRegion currentAtlasRegion = null;
 
         //System.out.println("isActionFacingRight: " + isActionFacingRight);
-
-        if (isStandPunchActive) {
+        if (isJumpAnimationActive) {
 
             //FIXME
             if (isActionFacingRight) //This must be always evaluating to false! So it keeps flipping
             {
                 currentAtlasRegion = new TextureRegion(
-                        (TextureAtlas.AtlasRegion) standPunchAnimation.getKeyFrame(standPunchAnimationTime));
+                        (TextureAtlas.AtlasRegion) jumpAnimation.getKeyFrame(jumpAnimationTime));
             } else //not initially right, then always use the x-flipped frame (left)
             { //the issue is that it flips every time when facing left is true, causing flips back and forth
                 currentAtlasRegion = new TextureRegion(
-                        (TextureAtlas.AtlasRegion) standPunchAnimation.getKeyFrame(standPunchAnimationTime));
+                        (TextureAtlas.AtlasRegion) jumpAnimation.getKeyFrame(jumpAnimationTime));
                 currentAtlasRegion.flip(true, false);
             }
 
             setRegion(currentAtlasRegion);
-            currentFrameNumber = standPunchAnimation.getKeyFrameIndex(standPunchAnimationTime);
-            standPunchAnimationTime += delta;
+            currentFrameNumber = jumpAnimation.getKeyFrameIndex(jumpAnimationTime);
+            jumpAnimationTime += delta;
 
-            if (standPunchAnimation.isAnimationFinished(standPunchAnimationTime)) {
-                isStandPunchActive = false;
-                standPunchAnimationTime = 0.0f;
+            if (jumpAnimation.isAnimationFinished(jumpAnimationTime)) {
+                isJumpAnimationActive = false;
+                jumpAnimationTime = 0.0f;
                 if (isInputRight)
                     setRegion((TextureAtlas.AtlasRegion) walk.get(0));
                 else if (isInputLeft) {
@@ -116,7 +113,7 @@ public class PlayerSprite extends Sprite
                 }
             }
 
-        } else if (!isAirborne) {
+        } else if (jumpRecog == JumpStates.TWO_F) {
             if (isInputRight) {
                 setRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(totalElapsedTime));
                 isFacingRight = true;

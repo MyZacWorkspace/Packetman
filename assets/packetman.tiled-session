@@ -1,0 +1,60 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "packetmanlevel1.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "cyberterrain.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "myFirstTileMap.tmx": {
+            "expandedObjectLayers": [
+                3
+            ],
+            "scale": 0.8275390625,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 512.3625206514043,
+                "y": 512.3625206514043
+            }
+        },
+        "packetmanlevel1.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 3,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 9,
+                "y": 956
+            }
+        },
+        "sample_forest.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/Users/zmact/Coding/clvnCap/assets/sprites",
+    "map.height": 32,
+    "map.lastUsedFormat": "tmx",
+    "map.width": 32,
+    "openFiles": [
+        "packetmanlevel1.tmx",
+        "cyberterrain.tsx",
+        "myFirstTileMap.tmx",
+        "sample_forest.tsx"
+    ],
+    "project": "packetman.tiled-project",
+    "recentFiles": [
+        "sample_forest.tsx",
+        "myFirstTileMap.tmx",
+        "cyberterrain.tsx",
+        "packetmanlevel1.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

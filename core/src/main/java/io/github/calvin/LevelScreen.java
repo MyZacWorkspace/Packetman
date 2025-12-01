@@ -88,6 +88,9 @@ public class LevelScreen implements Screen, ControllerListener
     Sprite hitBox2;
     Sprite hurtBox;
 
+    //Game Completion
+    int livesLeft = 3;
+
     public LevelScreen(final Calvin game, Controller control) {
         //As usual set a reference to the original Calvin object
         this.game = game;
@@ -98,7 +101,7 @@ public class LevelScreen implements Screen, ControllerListener
 
         tiledMapScale = game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER;
 
-        tiledMap = new TmxMapLoader().load("myFirstTileMap.tmx");
+        tiledMap = new TmxMapLoader().load("packetmanlevel1.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap,
                 1.0f / (tiledMapScale));
 				
@@ -151,6 +154,7 @@ public class LevelScreen implements Screen, ControllerListener
 
         MapProperties globalMapProperties = tiledMap.getProperties();
 
+        //Layer for Physics Collisions
         MapLayer objectLayer = tiledMap.getLayers().get("Object Layer 1");
         MapObjects gameMapObjects = objectLayer.getObjects();
         MapObject currentObject;
@@ -223,6 +227,7 @@ public class LevelScreen implements Screen, ControllerListener
         enemyShape.dispose();
 
         b2ddr = new Box2DDebugRenderer();
+
     }
 
   
@@ -230,14 +235,14 @@ public class LevelScreen implements Screen, ControllerListener
     public void render(float delta) {
         totalElapsedTime += delta;
 
-        ScreenUtils.clear(Color.GRAY);
+        ScreenUtils.clear(Color.BLACK);
 
         renderWorld(delta);
 
         scrollCamera();
         orthoCamera.update();
         tiledMapRenderer.setView(orthoCamera);
-        //tiledMapRenderer.render();
+        tiledMapRenderer.render();
 
         game.batch.begin();
 
@@ -254,21 +259,6 @@ public class LevelScreen implements Screen, ControllerListener
 		sirDuck.draw(game.batch);
 		enemy.draw(game.batch);
 
-        // CHECK ATTACKS -- HITBOX VISUALIZATION
-        //Remember Indexing starts at frame zero!
-        //Have a mutable list of hitbox sprites, and update these according to the current index in the literal and graphical hitbox, then draw. 
-        //Do for all.
-        if (player.isStandPunchActive && player.currentFrameNumber == 4) {
-            for (Rectangle thisBox : player.punch.getHitboxes(4)) {
-
-                //thisBox.x *= -1;
-                //thisBox.y *= -1;
-                hitBox.setBounds(thisBox.x + playerBody.getWorldCenter().x, thisBox.y + playerBody.getWorldCenter().y,
-                        thisBox.width, thisBox.height);
-                hitBox.draw(game.batch);
-            }
-        }
-
         //System.out.println(enemy.frameIndex);
 
         for(Rectangle thisBox : enemy.actionBite.getHitboxes(enemy.frameIndex))
@@ -283,8 +273,10 @@ public class LevelScreen implements Screen, ControllerListener
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
-        game.font.draw(game.batch, "Calvin the Capybara \nCoins " + coinsCollected + "\nScore " + score,
-            0.0f, 1.5f);
+        game.font.draw(game.batch, "Lives Left: " + livesLeft,
+                0.25f, 7.5f);
+        //FIXME format time more cleanly?
+        game.font.draw(game.batch, "Time: " + totalElapsedTime, 8.0f, 7.5f);
         
 
         game.batch.end();
@@ -301,7 +293,8 @@ public class LevelScreen implements Screen, ControllerListener
         player.setPosition(playerBody.getPosition().x - player.getWidth() / 2 / 25,
                 playerBody.getPosition().y - player.getHeight() / 2 / 25);
         enemy.setPosition(enemyBody.getPosition().x - enemy.getWidth()/2,
-                enemyBody.getPosition().y - enemy.getHeight()/2);
+                enemyBody.getPosition().y - enemy.getHeight() / 2);
+        //Hide box2d rendering
         b2ddr.render(world, orthoCamera.combined); // Matrix4 debug matrix
     }
     private void scrollCamera()
@@ -347,8 +340,15 @@ public class LevelScreen implements Screen, ControllerListener
         boolean isPlayerToTheRightOfEnemy;
         //End conditions
 	    if(player.getY() <= fallHeight)
-	    {
-		    endGame();
+        {
+            if (livesLeft > 0)
+            {
+                //FIXME need to fix controller polling when reloading the game screen
+                //Also show a defeat animation
+                game.setScreen(new LevelScreen(game, firstController));
+            }
+            else
+		        endGame();
 	    }
 	  
         Rectangle playerRect = player.getBoundingRectangle();
@@ -359,35 +359,6 @@ public class LevelScreen implements Screen, ControllerListener
 			endGame();
 		}
 		
-        Rectangle coinRect;
-        //Remove coins that come into contact with the player
-        //Updated so that the punch move collects coins
-        //In the future, only need to check active hitboxes.
-        for (int c = 0; c < coins.size; c++)
-        {
-            coinRect = coins.get(c).getBoundingRectangle();
-            Rectangle newHitbox = player.punch.getHitboxes(4).get(0);
-            Rectangle newnewHitbox = new Rectangle(newHitbox.x + playerBody.getWorldCenter().x, 
-                    newHitbox.y + playerBody.getWorldCenter().y, newHitbox.width, newHitbox.height);
-            //newHitbox.x += playerBody.getWorldCenter().x;
-            //newHitbox.y += playerBody.getWorldCenter().y;
-            if(player.isStandPunchActive && player.currentFrameNumber == 5 && coinRect.overlaps(newnewHitbox))
-            {
-                coins.removeIndex(c);
-                c--;
-                coinsCollected++;
-                score += 100L;
-            }
-            /*
-            if(playerRect.overlaps(coinRect))
-            {
-                coins.removeIndex(c);
-                c--;
-                coinsCollected++;
-                score += 100L;
-            }
-            */
-        }
         for (AnimatedSprite coin : coins)
         {
             coin.update(totalElapsedTime);
@@ -466,34 +437,10 @@ public class LevelScreen implements Screen, ControllerListener
         //Jump Button
         if (controller.getButton(controller.getMapping().buttonA) && player.isAllowedToJump)
         {
-            playerBody.applyForceToCenter(0.0f, 40.0f, false);
+            playerBody.applyForceToCenter(0.0f, 75.0f, false);
             player.isAllowedToJump = false;
             player.jumpRecog = JumpStates.NONE; //Look for the pattern once more
-        }
-
-
-		//FIXME need to check all hit and hurtBoxes
-		Rectangle sampleHitBox = player.punch.getHitboxes(4).get(0);
-		boolean wasActionFacingRight = Boolean.valueOf(player.isActionFacingRight);
-
-        if (controller.getButton(controller.getMapping().buttonX))
-        {
-            if (!player.isStandPunchActive) //When the punch is not active
-            {
-                //The action direction is dependent on the direction being faced
-                player.isActionFacingRight = Boolean.valueOf(player.isFacingRight);
-                if (wasActionFacingRight != player.isActionFacingRight) {
-                    if (!player.isActionFacingRight) {
-                        sampleHitBox.x *= -1;
-                        sampleHitBox.x -= sampleHitBox.width;
-                    } else {
-                        sampleHitBox.x += sampleHitBox.width;
-                        sampleHitBox.x *= -1;
-                    }
-
-                }
-                player.isStandPunchActive = true;
-            }
+            player.isJumpAnimationActive = true;
         }
         
         if(controller.getButton(controller.getMapping().buttonDpadRight))
