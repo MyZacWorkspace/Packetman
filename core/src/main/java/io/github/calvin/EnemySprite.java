@@ -18,13 +18,9 @@ public class EnemySprite extends Sprite
 	private float scale = 5.0f;
 	//Frames
 	private Array<TextureAtlas.AtlasRegion> walk;
-	private Array<TextureAtlas.AtlasRegion> bite;
 	//Animation
 	private final float ANIMATION_FRAME_SPEED = 0.09f;
 	private Animation animationWalk;
-	private Animation animationBite;
-	//FrameData
-	ActionFrameData actionBite;
 	//Function
 	private float distanceFromPlayer;
 	private final float THRESHOLD_DIST = 2.0f;
@@ -42,13 +38,6 @@ public class EnemySprite extends Sprite
 		animationWalk = new Animation<TextureAtlas.AtlasRegion>(ANIMATION_FRAME_SPEED, walk);
 		animationWalk.setPlayMode(Animation.PlayMode.LOOP);
 
-		bite = atlas.findRegions("bite");
-		animationBite = new Animation<TextureAtlas.AtlasRegion>(ANIMATION_FRAME_SPEED, bite);
-		animationBite.setPlayMode(Animation.PlayMode.LOOP);
-		
-		actionBite = new ActionFrameData(bite.size);
-		actionBite.appendHitbox(6, 0.2f, 0.1f, 1.0f, 0.5f);
-
         //Set bounds: position and size
 		setBounds(x, y, ((float)walk.get(0).getRegionWidth())/Calvin.PIXELS_IN_METERS * scale, 
 						((float)walk.get(0).getRegionHeight())/Calvin.PIXELS_IN_METERS * scale);
@@ -60,7 +49,7 @@ public class EnemySprite extends Sprite
     public void update(float totalElapsedTime, Vector2 playerPos)
     {
 		TextureRegion currentRegion;
-		if(distanceFromPlayer > THRESHOLD_DIST)
+		if(distanceFromPlayer < THRESHOLD_DIST)
 		{
 			frameIndex =  animationWalk.getKeyFrameIndex(totalElapsedTime);
 			if (playerPos.x > this.getX())
@@ -75,15 +64,17 @@ public class EnemySprite extends Sprite
 		}
 		else
 		{
-			frameIndex = animationBite.getKeyFrameIndex(totalElapsedTime);
-			if (playerPos.x > this.getX())
-				setRegion((TextureAtlas.AtlasRegion) animationBite.getKeyFrame(totalElapsedTime));
-			else {
-				currentRegion = new TextureRegion(
-						(TextureAtlas.AtlasRegion) animationBite.getKeyFrame(totalElapsedTime));
-				currentRegion.flip(true, false);
-				setRegion(currentRegion);
+			if(playerPos.x > this.getX())
+			{
+				currentRegion = new TextureRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(0.0f));
 			}
+			else
+			{
+				currentRegion = new TextureRegion((TextureAtlas.AtlasRegion) animationWalk.getKeyFrame(0.0f));
+				currentRegion.flip(true, false);
+			}
+
+			setRegion(currentRegion);
 		}
     }
 	

@@ -46,9 +46,6 @@ public class LevelScreen implements Screen, ControllerListener
 
     //Sprites
     PlayerSprite player;
-    Array<AnimatedSprite> coins;
-    String COIN_PATH = "sprites/cappyCoin.atlas";
-    int coinsCollected = 0;
     long score;
 	
 	AnimatedSprite homeNetwork;
@@ -130,30 +127,14 @@ public class LevelScreen implements Screen, ControllerListener
 
         generateSprites();
         generateWorld();
-
-        
-        //FIXME just for hitbox visualization
-        hitBox = new Sprite(new Texture(Gdx.files.internal("Hit.png")));
-        hitBox.setAlpha(0.50f);
-        hitBox2 = new Sprite(new Texture(Gdx.files.internal("Hurt.png")));
-        hitBox2.setAlpha(0.50f);
     }
 
     public void generateSprites() 
     {
         player = new PlayerSprite(5.0f, 5.0f);
-        coins = new Array<AnimatedSprite>();
-        coins.add( new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 8.0f, 3.0f));
-        coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 12.0f, 3.0f));
-        //coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 16.0f, 4.0f));
-		
         wwweb = new AnimatedSprite("sprites/worldwideweb.atlas", 0.0f, 0.0f, 0.2f, 12.0f, 0.0f, 5.0f);
-		
 		homeNetwork = new AnimatedSprite("sprites/homenetwork.atlas", 0.0f, 0.0f, 0.2f, 12.0f, 25.0f, 5.0f);
-
-		enemy = new EnemySprite("sprites/lizard.atlas", 5.0f, 5.0f);
-
-
+		enemy = new EnemySprite("sprites/malware.atlas", 5.0f, 5.0f);
     }
 
     public void generateWorld() 
@@ -235,7 +216,6 @@ public class LevelScreen implements Screen, ControllerListener
         enemyShape.dispose();
 
         b2ddr = new Box2DDebugRenderer();
-
     }
 
   
@@ -259,47 +239,27 @@ public class LevelScreen implements Screen, ControllerListener
         game.batch.setProjectionMatrix(orthoCamera.combined);
 
         player.draw(game.batch);
-        for (AnimatedSprite coin : coins)
-        {
-            coin.draw(game.batch);
-        }
-		
 		homeNetwork.draw(game.batch);
         wwweb.draw(game.batch);
 		enemy.draw(game.batch);
-
-
-        //System.out.println(enemy.frameIndex);
-
-        for(Rectangle thisBox : enemy.actionBite.getHitboxes(enemy.frameIndex))
-        {
-            hitBox.setBounds(thisBox.x + enemyBody.getWorldCenter().x, thisBox.y + enemyBody.getWorldCenter().y,
-                    thisBox.width, thisBox.height);
-            hitBox.draw(game.batch);
-        }        
-        
-        //hitBox.draw(game.batch);
-        //hurtBox.draw(game.batch);
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
         game.font.draw(game.batch, "Lives Left: " + LevelScreen.livesLeft,
                 0.25f, 7.5f);
-        //FIXME format time more cleanly?
         game.font.draw(game.batch, "Time: " + totalElapsedTime, 8.0f, 7.5f);
         
-
         game.batch.end();
 	  
+
+        //System.out.println("Player Y-Velocity: " + playerBody.getLinearVelocity().y);
         updateEntities(totalElapsedTime, delta);
-        
     }
 
     private void renderWorld(float delta) 
     {
         world.step(1 / 60f, 6, 2);
 
-        //FIXME simplify handling player scale
         player.setPosition(playerBody.getPosition().x - player.getWidth() / 2 / 25,
                 playerBody.getPosition().y - player.getHeight() / 2 / 25);
         enemy.setPosition(enemyBody.getPosition().x - enemy.getWidth()/2,
@@ -351,6 +311,13 @@ public class LevelScreen implements Screen, ControllerListener
     {
         boolean isPlayerToTheRightOfEnemy;
         //End conditions
+        Rectangle playerRect = player.getBoundingRectangle();
+        Rectangle victoryRect = homeNetwork.getBoundingRectangle();
+        
+		if(playerRect.overlaps(victoryRect))
+		{
+			endGame();
+		}
 	    if(player.getY() <= fallHeight)
         {
             LevelScreen.livesLeft--;
@@ -363,23 +330,8 @@ public class LevelScreen implements Screen, ControllerListener
             else
 		        endGame();
 	    }
-	  
-        Rectangle playerRect = player.getBoundingRectangle();
-        Rectangle victoryRect = homeNetwork.getBoundingRectangle();
-        
-		if(playerRect.overlaps(victoryRect))
-		{
-			endGame();
-		}
-		
-        for (AnimatedSprite coin : coins)
-        {
-            coin.update(totalElapsedTime);
-        }
-
         wwweb.update(totalElapsedTime);
         homeNetwork.update(totalElapsedTime);
-
         //Run through Automata
         //FIXME -- Be careful of comparing floating points
         //And rounding with doubles
@@ -389,7 +341,7 @@ public class LevelScreen implements Screen, ControllerListener
             float currentPlayerY_Velocity = playerBody.getLinearVelocity().y;
             if (currentPlayerY_Velocity != 0.0f) {
                 player.jumpRecog = JumpStates.NONE;
-            } else if (currentPlayerY_Velocity == 0) //Zero y_velocity found
+            } else if (Math.abs(currentPlayerY_Velocity) < 0.01) //Zero y_velocity found
             {
                 if (player.jumpRecog == JumpStates.NONE)
                     player.jumpRecog = JumpStates.ONCE;
@@ -401,8 +353,6 @@ public class LevelScreen implements Screen, ControllerListener
             }
         }
 
-
-
         if (player.jumpRecog == JumpStates.TWO_F) //This means you are grounded
         { // You will always remain in the NONE state in the air!
             if (player.isInputRight) 
@@ -413,24 +363,31 @@ public class LevelScreen implements Screen, ControllerListener
                 playerBody.setLinearVelocity(-2.0f, playerBody.getLinearVelocity().y);
             }
         }
+
+        System.out.println("Is the player running?: " + player.isRunning);
+        //Now do speed
+        if(player.isRunning)
+        {
+            if(player.isFacingRight)
+                playerBody.applyForceToCenter(player.speedAccel, 0.0f,false);
+            else
+                playerBody.applyForceToCenter(-player.speedAccel, 0.0f,false);
+        }
+           
+
         player.update(totalElapsedTime, delta);
 
-        // System.out.println("distance from player: " +
-        // player.getPositionV2().dst(enemy.getPositionV2()));
         enemy.setDistanceFromPlayer(player.getPositionV2().dst(enemy.getPositionV2()));
-        //FIXME make this a little more optimal
-        if (enemy.getDistanceFromPlayer() > 2.0f)
+        if (enemy.getDistanceFromPlayer() < 2.0f)
         {
             if (playerBody.getPosition().x < enemyBody.getPosition().x) {
                 isPlayerToTheRightOfEnemy = false;
-                enemyBody.setLinearVelocity(-0.5f, enemyBody.getLinearVelocity().y);
+                enemyBody.setLinearVelocity(-1.0f, enemyBody.getLinearVelocity().y);
             } else {
                 isPlayerToTheRightOfEnemy = false;
-                enemyBody.setLinearVelocity(0.5f, enemyBody.getLinearVelocity().y);
+                enemyBody.setLinearVelocity(1.0f, enemyBody.getLinearVelocity().y);
             }
         }
-       
-    
         enemy.update(totalElapsedTime, playerBody.getWorldCenter());
     }
 	
@@ -451,14 +408,21 @@ public class LevelScreen implements Screen, ControllerListener
 
         controller = firstController;
 
+        if(controller.getButton(controller.getMapping().buttonY) ||
+             controller.getButton(controller.getMapping().buttonX))
+        {
+            player.isRunning = true;
+        }
+
         //Jump Button
         if (controller.getButton(controller.getMapping().buttonA) && player.isAllowedToJump)
         {
-            playerBody.applyForceToCenter(0.0f, 75.0f, false);
+            playerBody.applyForceToCenter(0.0f, 125.0f, false);
             player.isAllowedToJump = false;
             player.jumpRecog = JumpStates.NONE; //Look for the pattern once more
             player.isJumpAnimationActive = true;
         }
+
         
         if(controller.getButton(controller.getMapping().buttonDpadRight))
         {
@@ -475,6 +439,12 @@ public class LevelScreen implements Screen, ControllerListener
     public boolean buttonUp(Controller controller, int buttonCode) {
 
         controller = firstController;
+
+        if(controller.getButton(controller.getMapping().buttonY) ||
+             controller.getButton(controller.getMapping().buttonX))
+        {
+            player.isRunning = false;
+        }
 
         if (buttonCode == controller.getMapping().buttonDpadRight) {
             player.isInputRight = false;

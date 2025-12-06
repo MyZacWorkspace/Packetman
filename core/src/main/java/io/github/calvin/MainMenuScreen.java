@@ -25,12 +25,13 @@ public class MainMenuScreen implements Screen, ControllerListener
 		firstController = control;
 
         try{
+            firstController.addListener(this);
         }
         catch (NullPointerException npe)
         {
             System.err.println("No controller");
         }
-        firstController.addListener(this);
+        
     }
 
     @Override
@@ -57,6 +58,7 @@ public class MainMenuScreen implements Screen, ControllerListener
         if(Gdx.input.isKeyPressed(Input.Keys.Z))
         {
             //System.out.println("GAME START");
+            firstController.removeListener(this);
             game.setScreen(new LevelScreen(game, firstController));
         }
     }

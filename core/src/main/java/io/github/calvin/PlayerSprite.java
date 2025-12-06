@@ -35,6 +35,12 @@ public class PlayerSprite extends Sprite
     boolean isJumpAnimationActive;
     float jumpAnimationTime;
 
+    //Control faster movement
+    float speedAccel = 10.0f;
+    boolean isRunning = false;
+    float originalWalkSpeed;
+    //Boolean for animation modification
+
     //See if input is right or left (could never be both at the same time!)
     boolean isInputRight = false;
     boolean isInputLeft = false;
