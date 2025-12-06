@@ -10,7 +10,7 @@ import com.badlogic.gdx.Input;
 
 import com.badlogic.gdx.controllers.*;
 
-public class MainMenuScreen implements Screen
+public class MainMenuScreen implements Screen, ControllerListener
 {
     final Calvin game;
 	
@@ -23,14 +23,20 @@ public class MainMenuScreen implements Screen
         //System.out.println(game.hud_viewport.getCamera().position);
         //System.out.println("450 / pix in metres: " + 450 / game.PIXELS_IN_METERS);
 		firstController = control;
+
+        try{
+        }
+        catch (NullPointerException npe)
+        {
+            System.err.println("No controller");
+        }
+        firstController.addListener(this);
     }
 
     @Override
     public void render(float delta)
     {
         ScreenUtils.clear(Color.BLACK);
-        
-        
         
         game.batch.begin();
 
@@ -50,11 +56,56 @@ public class MainMenuScreen implements Screen
        
         if(Gdx.input.isKeyPressed(Input.Keys.Z))
         {
-            System.out.println("GAME START");
+            //System.out.println("GAME START");
             game.setScreen(new LevelScreen(game, firstController));
         }
     }
 
+    //Controller Support
+    @Override
+    public boolean buttonDown(Controller controller, int buttonCode) {
+
+        controller = firstController;
+
+        //Jump Button
+        if (controller.getButton(controller.getMapping().buttonR1))
+        {
+            controller.removeListener(this);
+            game.setScreen(new LevelScreen(game, firstController));
+            
+        }
+        //Doesn't matter what it returns
+        return true;
+    }
+	
+
+    @Override
+    public boolean buttonUp(Controller controller, int buttonCode) 
+    { return true; }
+
+    @Override
+    public void connected(Controller controller) {
+
+		System.out.println("Connection ESTABLISHED!");
+		try {
+            controller.addListener(this);
+        } catch (NullPointerException npe) {
+        }
+		firstController = controller;
+    }
+
+    @Override
+    public void disconnected(Controller controller) {
+
+		System.out.println("DISCONNECTED " + controller.getName());
+    }
+
+    @Override
+    public boolean axisMoved(Controller controller, int axisCode, float value) 
+    { return true; }
+
+
+    //FIXME use this to resize viewport properly
     @Override
     public void resize(int width, int height)
     {

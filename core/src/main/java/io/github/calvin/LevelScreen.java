@@ -51,7 +51,7 @@ public class LevelScreen implements Screen, ControllerListener
     int coinsCollected = 0;
     long score;
 	
-	Sprite sirDuck;
+	AnimatedSprite homeNetwork;
 	
 	EnemySprite enemy;
 
@@ -89,7 +89,9 @@ public class LevelScreen implements Screen, ControllerListener
     Sprite hurtBox;
 
     //Game Completion
-    int livesLeft = 3;
+    static int livesLeft = 3;
+
+    AnimatedSprite wwweb;
 
     public LevelScreen(final Calvin game, Controller control) {
         //As usual set a reference to the original Calvin object
@@ -114,11 +116,16 @@ public class LevelScreen implements Screen, ControllerListener
 			{ firstController.addListener(this);} 
 			catch (NullPointerException npe) {}
 		}
-		else
-		{
-			Controllers.addListener(this);
-		}
-		
+        else
+        {
+            Controllers.addListener(this);
+            firstController = Controllers.getCurrent();
+            try
+            { firstController.addListener(this);}
+            catch (NullPointerException npe) {
+                System.err.println();
+            }
+        }
 		
 
         generateSprites();
@@ -140,12 +147,13 @@ public class LevelScreen implements Screen, ControllerListener
         coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 12.0f, 3.0f));
         //coins.add(new AnimatedSprite(COIN_PATH, 0.0f, 0.0f, 0.1f, 20.0f, 16.0f, 4.0f));
 		
+        wwweb = new AnimatedSprite("sprites/worldwideweb.atlas", 0.0f, 0.0f, 0.2f, 12.0f, 0.0f, 5.0f);
 		
-		sirDuck = new Sprite(new Texture(Gdx.files.internal("sprites/sirDuck.png")));
-		//sirDuck.setBounds(0.0f, 0.0f, sirDuck.getWidth()/game.PIXELS_IN_METERS, sirDuck.getHeight()/game.PIXELS_IN_METERS);
-		sirDuck.setPosition(25.0f, 2.3f);
-		sirDuck.setSize(sirDuck.getWidth()/game.PIXELS_IN_METERS * 5, sirDuck.getHeight()/game.PIXELS_IN_METERS * 5);
-		enemy = new EnemySprite("sprites/lizard.atlas", 0.0f, 3.0f);
+		homeNetwork = new AnimatedSprite("sprites/homenetwork.atlas", 0.0f, 0.0f, 0.2f, 12.0f, 25.0f, 5.0f);
+
+		enemy = new EnemySprite("sprites/lizard.atlas", 5.0f, 5.0f);
+
+
     }
 
     public void generateWorld() 
@@ -256,8 +264,10 @@ public class LevelScreen implements Screen, ControllerListener
             coin.draw(game.batch);
         }
 		
-		sirDuck.draw(game.batch);
+		homeNetwork.draw(game.batch);
+        wwweb.draw(game.batch);
 		enemy.draw(game.batch);
+
 
         //System.out.println(enemy.frameIndex);
 
@@ -273,7 +283,7 @@ public class LevelScreen implements Screen, ControllerListener
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
-        game.font.draw(game.batch, "Lives Left: " + livesLeft,
+        game.font.draw(game.batch, "Lives Left: " + LevelScreen.livesLeft,
                 0.25f, 7.5f);
         //FIXME format time more cleanly?
         game.font.draw(game.batch, "Time: " + totalElapsedTime, 8.0f, 7.5f);
@@ -297,6 +307,8 @@ public class LevelScreen implements Screen, ControllerListener
         //Hide box2d rendering
         b2ddr.render(world, orthoCamera.combined); // Matrix4 debug matrix
     }
+
+
     private void scrollCamera()
     {
         float horizontalDisplacement = 0.0f;
@@ -341,10 +353,11 @@ public class LevelScreen implements Screen, ControllerListener
         //End conditions
 	    if(player.getY() <= fallHeight)
         {
+            LevelScreen.livesLeft--;
             if (livesLeft > 0)
             {
-                //FIXME need to fix controller polling when reloading the game screen
-                //Also show a defeat animation
+                //FIXME Defeat animation
+                firstController.removeListener(this);
                 game.setScreen(new LevelScreen(game, firstController));
             }
             else
@@ -352,9 +365,9 @@ public class LevelScreen implements Screen, ControllerListener
 	    }
 	  
         Rectangle playerRect = player.getBoundingRectangle();
-        Rectangle duckRect = sirDuck.getBoundingRectangle();
+        Rectangle victoryRect = homeNetwork.getBoundingRectangle();
         
-		if(playerRect.overlaps(duckRect))
+		if(playerRect.overlaps(victoryRect))
 		{
 			endGame();
 		}
@@ -363,6 +376,9 @@ public class LevelScreen implements Screen, ControllerListener
         {
             coin.update(totalElapsedTime);
         }
+
+        wwweb.update(totalElapsedTime);
+        homeNetwork.update(totalElapsedTime);
 
         //Run through Automata
         //FIXME -- Be careful of comparing floating points
@@ -423,6 +439,7 @@ public class LevelScreen implements Screen, ControllerListener
 	{
 		firstController.removeListener(this);
 		Controllers.removeListener(this);
+        game.dispose();
 		game.create();
 	}
 	
