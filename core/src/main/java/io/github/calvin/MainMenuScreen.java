@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
 import com.badlogic.gdx.controllers.*;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class MainMenuScreen implements Screen, ControllerListener
 {
@@ -44,13 +45,9 @@ public class MainMenuScreen implements Screen, ControllerListener
         game.viewport.apply();
         game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
         
-        game.font.draw(game.batch, "Calvin the Capybara :)" , 1.0f, 4.5f);
+        game.font.draw(game.batch, "Packet-Man" , 1.0f, 4.5f);
         game.font.draw(game.batch, "Click anywhere to begin!", 1f,
                 1f);
-
-        game.hud_viewport.apply();
-        game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
-        game.font.draw(game.batch, "It's a cool game", 0.5f, 6.0f);
 
         game.batch.end();
 

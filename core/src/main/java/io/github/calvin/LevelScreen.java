@@ -50,7 +50,7 @@ public class LevelScreen implements Screen, ControllerListener
 	
 	AnimatedSprite homeNetwork;
 	
-	EnemySprite enemy;
+	Array<EnemySprite> enemies;
 
     //Sample Player World-Object
     BodyDef playerBodyDef;
@@ -61,7 +61,7 @@ public class LevelScreen implements Screen, ControllerListener
 
     //Sample Enemy
     BodyDef enemyBodyDef;
-    Body enemyBody;
+    Array<Body> enemyBodies;
     PolygonShape enemyShape;
     FixtureDef enemyFixtureDef;
     Fixture enemyFixture;
@@ -134,7 +134,12 @@ public class LevelScreen implements Screen, ControllerListener
         player = new PlayerSprite(5.0f, 5.0f);
         wwweb = new AnimatedSprite("sprites/worldwideweb.atlas", 0.0f, 0.0f, 0.2f, 12.0f, 0.0f, 5.0f);
 		homeNetwork = new AnimatedSprite("sprites/homenetwork.atlas", 0.0f, 0.0f, 0.2f, 12.0f, 25.0f, 5.0f);
-		enemy = new EnemySprite("sprites/malware.atlas", 5.0f, 5.0f);
+
+        enemies = new Array<EnemySprite>();
+		EnemySprite enemy1 = new EnemySprite("sprites/malware.atlas", 5.0f, 5.0f);
+        EnemySprite enemy2 = new EnemySprite("sprites/malware.atlas", 7.0f, 5.0f);
+
+        enemies.add(enemy1, enemy2);
     }
 
     public void generateWorld() 
@@ -199,21 +204,26 @@ public class LevelScreen implements Screen, ControllerListener
         playerShape.dispose();
         
         //Enemy Shape
-        enemyBodyDef = new BodyDef();
-        enemyBodyDef.type = BodyType.DynamicBody;
-        enemyBodyDef.position.set(enemy.getX() , enemy.getY());
-        enemyBody = world.createBody(enemyBodyDef);
-        enemyBody.setFixedRotation(true);
+        enemyBodies = new Array<Body>();
+        for(int i = 0 ; i < enemies.size ; i++)
+        {
+            enemyBodyDef = new BodyDef();
+            enemyBodyDef.type = BodyType.DynamicBody;
+            enemyBodyDef.position.set(enemies.get(i).getX() , enemies.get(i).getY());
+            enemyBodies.add(world.createBody(enemyBodyDef));
+            enemyBodies.get(i).setFixedRotation(true);
 
-        enemyShape = new PolygonShape();
-        enemyShape.setAsBox(enemy.getWidth()  / 2, enemy.getHeight() / 2);
-        enemyFixtureDef = new FixtureDef();
-        enemyFixtureDef.shape = enemyShape;
-        enemyFixtureDef.density = 0.77f;
-        enemyFixtureDef.friction = 0.5f;
-        enemyFixtureDef.restitution = 0.0f;
-        enemyFixture = enemyBody.createFixture(enemyFixtureDef);
-        enemyShape.dispose();
+            enemyShape = new PolygonShape();
+            enemyShape.setAsBox(enemies.get(i).getWidth()  / 2, enemies.get(i).getHeight() / 2);
+            enemyFixtureDef = new FixtureDef();
+            enemyFixtureDef.shape = enemyShape;
+            enemyFixtureDef.density = 0.77f;
+            enemyFixtureDef.friction = 0.5f;
+            enemyFixtureDef.restitution = 0.0f;
+            enemyFixture = enemyBodies.get(i).createFixture(enemyFixtureDef);
+            enemyShape.dispose();
+        }
+       
 
         b2ddr = new Box2DDebugRenderer();
     }
@@ -241,7 +251,11 @@ public class LevelScreen implements Screen, ControllerListener
         player.draw(game.batch);
 		homeNetwork.draw(game.batch);
         wwweb.draw(game.batch);
-		enemy.draw(game.batch);
+
+        for(EnemySprite es : enemies)
+        {
+            es.draw(game.batch);
+        }
 
         game.hud_viewport.apply();
         game.batch.setProjectionMatrix(game.hud_viewport.getCamera().combined);
@@ -262,8 +276,13 @@ public class LevelScreen implements Screen, ControllerListener
 
         player.setPosition(playerBody.getPosition().x - player.getWidth() / 2 / 25,
                 playerBody.getPosition().y - player.getHeight() / 2 / 25);
-        enemy.setPosition(enemyBody.getPosition().x - enemy.getWidth()/2,
-                enemyBody.getPosition().y - enemy.getHeight() / 2);
+
+        for(int i = 0 ; i < enemies.size ; i++)
+        {
+            enemies.get(i).setPosition(enemyBodies.get(i).getPosition().x - enemies.get(i).getWidth()/2,
+                enemyBodies.get(i).getPosition().y - enemies.get(i).getHeight() / 2);
+        }
+        
         //Hide box2d rendering
         b2ddr.render(world, orthoCamera.combined); // Matrix4 debug matrix
     }
@@ -330,6 +349,7 @@ public class LevelScreen implements Screen, ControllerListener
             else
 		        endGame();
 	    }
+        
         wwweb.update(totalElapsedTime);
         homeNetwork.update(totalElapsedTime);
         //Run through Automata
@@ -377,18 +397,22 @@ public class LevelScreen implements Screen, ControllerListener
 
         player.update(totalElapsedTime, delta);
 
-        enemy.setDistanceFromPlayer(player.getPositionV2().dst(enemy.getPositionV2()));
-        if (enemy.getDistanceFromPlayer() < 2.0f)
+        for(int i = 0; i < enemies.size ; i++)
         {
-            if (playerBody.getPosition().x < enemyBody.getPosition().x) {
-                isPlayerToTheRightOfEnemy = false;
-                enemyBody.setLinearVelocity(-1.0f, enemyBody.getLinearVelocity().y);
-            } else {
-                isPlayerToTheRightOfEnemy = false;
-                enemyBody.setLinearVelocity(1.0f, enemyBody.getLinearVelocity().y);
+            enemies.get(i).setDistanceFromPlayer(player.getPositionV2().dst(enemies.get(i).getPositionV2()));
+            if (enemies.get(i).getDistanceFromPlayer() < 2.0f)
+            {
+                if (playerBody.getPosition().x < enemyBodies.get(i).getPosition().x) {
+                    isPlayerToTheRightOfEnemy = false;
+                    enemyBodies.get(i).setLinearVelocity(-1.0f, enemyBodies.get(i).getLinearVelocity().y);
+                } else {
+                    isPlayerToTheRightOfEnemy = false;
+                    enemyBodies.get(i).setLinearVelocity(1.0f, enemyBodies.get(i).getLinearVelocity().y);
+                }
             }
+
+            enemies.get(i).update(totalElapsedTime, playerBody.getWorldCenter());
         }
-        enemy.update(totalElapsedTime, playerBody.getWorldCenter());
     }
 	
 	//End Game
@@ -408,13 +432,7 @@ public class LevelScreen implements Screen, ControllerListener
 
         controller = firstController;
 
-        if(controller.getButton(controller.getMapping().buttonY) ||
-             controller.getButton(controller.getMapping().buttonX))
-        {
-            player.isRunning = true;
-        }
-
-        //Jump Button
+                //Jump Button
         if (controller.getButton(controller.getMapping().buttonA) && player.isAllowedToJump)
         {
             playerBody.applyForceToCenter(0.0f, 125.0f, false);
@@ -431,6 +449,15 @@ public class LevelScreen implements Screen, ControllerListener
         else if (controller.getButton(controller.getMapping().buttonDpadLeft)) {
             player.isInputLeft = true;
         }
+
+        //FIXME Ask Libgdx community, why was this giving so much trouble!
+        if((player.isInputRight || player.isInputLeft) && buttonCode == controller.getMapping().buttonY ||
+            buttonCode == controller.getMapping().buttonX)
+        {
+            player.isRunning = true;
+        }
+
+
         return true;
     }
 	
@@ -440,19 +467,18 @@ public class LevelScreen implements Screen, ControllerListener
 
         controller = firstController;
 
-        if(controller.getButton(controller.getMapping().buttonY) ||
-             controller.getButton(controller.getMapping().buttonX))
-        {
-            player.isRunning = false;
-        }
-
         if (buttonCode == controller.getMapping().buttonDpadRight) {
             player.isInputRight = false;
         } else if (buttonCode == controller.getMapping().buttonDpadLeft) {
             player.isInputLeft = false;
         }
 
-        // throw new UnsupportedOperationException("Unimplemented method 'buttonUp'");
+        if(buttonCode == controller.getMapping().buttonY ||
+             buttonCode == controller.getMapping().buttonX)
+        {
+            player.isRunning = false;
+        }
+
         return false;
     }
 
