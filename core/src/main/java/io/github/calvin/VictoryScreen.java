@@ -16,20 +16,24 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class MainMenuScreen implements Screen, ControllerListener
+public class VictoryScreen implements Screen, ControllerListener
 {
     final Calvin game;
 	
 	Controller firstController;
 
     BitmapFont title;
+    BitmapFont subtitle;
 
     TextureAtlas playerAtlas;
     Sprite playerSprite;
 
-    public MainMenuScreen(final Calvin game, Controller control)
+    float time;
+
+    public VictoryScreen(final Calvin game, Controller control, float time)
     {
         this.game = game;
+        this.time = time;
         //System.out.println(game.viewport.getCamera().position);
         //System.out.println(game.hud_viewport.getCamera().position);
         //System.out.println("450 / pix in metres: " + 450 / game.PIXELS_IN_METERS);
@@ -44,19 +48,25 @@ public class MainMenuScreen implements Screen, ControllerListener
         }
 
         title = new BitmapFont();
-        title.setColor(Color.CYAN);
+        title.setColor(Color.GREEN);
         title.setUseIntegerPositions(false);
         float titleScale = game.hud_viewport.getMinWorldHeight()/Gdx.graphics.getHeight();
         //System.out.println("titleScale: " + titleScale); 
         //0.0156
         title.getData().setScale(titleScale + 0.05f);
 
+        subtitle = new BitmapFont();
+        subtitle.setColor(Color.CYAN);
+        subtitle.setUseIntegerPositions(false);
+        float subtitleScale = game.hud_viewport.getMinWorldHeight()/Gdx.graphics.getHeight();
+        //System.out.println("titleScale: " + titleScale); 
+        //0.0156
+        subtitle.getData().setScale(subtitleScale + 0.02f);
+
         playerAtlas = new TextureAtlas(Gdx.files.internal("sprites/packetman.atlas"));
-        playerSprite = new Sprite(playerAtlas.findRegion("walk"));
+        playerSprite = new Sprite(playerAtlas.findRegions("jump").get(2));
         
         playerSprite.setBounds(5.0f, 5.0f, 2.0f ,1.0f);
-        
-        LevelScreen.livesLeft = 3;
     }
 
     @Override
@@ -69,13 +79,10 @@ public class MainMenuScreen implements Screen, ControllerListener
         game.viewport.apply();
         game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
         
-        title.draw(game.batch, "Packet-Man", 1.0f, 5.0f);
+        title.draw(game.batch, "Victory!", 1.0f, 5.0f);
+        subtitle.draw(game.batch, "Score: " + ((int)Math.ceil((1 / time)*10000)), 1.0f, 4.0f); 
         playerSprite.draw(game.batch);
-        game.font.draw(game.batch, "Guide the WiFi packet from the Internet to the home network safely!", 1f,
-                3f);
-        game.font.draw(game.batch, "Avoid malware!", 1f,
-                2f);
-        game.font.draw(game.batch, "Press R to Start!", 1f,
+        game.font.draw(game.batch, "Press R to Return to the Main Menu", 1f,
                 1f);
 
         game.batch.end();
@@ -102,7 +109,7 @@ public class MainMenuScreen implements Screen, ControllerListener
         if (controller.getButton(controller.getMapping().buttonR1))
         {
             controller.removeListener(this);
-            game.setScreen(new LevelScreen(game, firstController));
+            game.setScreen(new MainMenuScreen(game, firstController));
             
         }
         //Doesn't matter what it returns

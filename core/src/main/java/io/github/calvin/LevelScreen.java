@@ -34,7 +34,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 
-public class LevelScreen implements Screen, ControllerListener 
+public class LevelScreen implements Screen, ControllerListener, ContactListener
  {
     Calvin game;
     World world;
@@ -86,7 +86,7 @@ public class LevelScreen implements Screen, ControllerListener
     Sprite hurtBox;
 
     //Game Completion
-    static int livesLeft = 3;
+    static int livesLeft;
 
     AnimatedSprite wwweb;
 
@@ -100,7 +100,7 @@ public class LevelScreen implements Screen, ControllerListener
 
         tiledMapScale = game.PIXELS_IN_METERS - MAP_SCALE_MODIFIER;
 
-        tiledMap = new TmxMapLoader().load("packetmanlevel1.tmx");
+        tiledMap = new TmxMapLoader().load("packetmandemo.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap,
                 1.0f / (tiledMapScale));
 				
@@ -124,7 +124,6 @@ public class LevelScreen implements Screen, ControllerListener
             }
         }
 		
-
         generateSprites();
         generateWorld();
     }
@@ -133,13 +132,14 @@ public class LevelScreen implements Screen, ControllerListener
     {
         player = new PlayerSprite(5.0f, 5.0f);
         wwweb = new AnimatedSprite("sprites/worldwideweb.atlas", 0.0f, 0.0f, 0.2f, 12.0f, 0.0f, 5.0f);
-		homeNetwork = new AnimatedSprite("sprites/homenetwork.atlas", 0.0f, 0.0f, 0.2f, 12.0f, 25.0f, 5.0f);
+		homeNetwork = new AnimatedSprite("sprites/homenetwork.atlas", 0.0f, 0.0f, 0.2f, 12.0f, 47.363f, 3.427f);
 
         enemies = new Array<EnemySprite>();
-		EnemySprite enemy1 = new EnemySprite("sprites/malware.atlas", 5.0f, 5.0f);
-        EnemySprite enemy2 = new EnemySprite("sprites/malware.atlas", 7.0f, 5.0f);
-
-        enemies.add(enemy1, enemy2);
+		EnemySprite enemy1 = new EnemySprite("sprites/malware.atlas", 9.655f, 3.421f);
+        //EnemySprite enemy2 = new EnemySprite("sprites/malware.atlas", 23.3f, 6.621f);
+        EnemySprite enemy3 = new EnemySprite("sprites/malware.atlas", 28.0619f, 1.45f);
+        //EnemySprite enemy4 = new EnemySprite("sprites/malware.atlas", 35.780f, 3.421f);
+        enemies.add(enemy1, enemy3);
     }
 
     public void generateWorld() 
@@ -214,7 +214,7 @@ public class LevelScreen implements Screen, ControllerListener
             enemyBodies.get(i).setFixedRotation(true);
 
             enemyShape = new PolygonShape();
-            enemyShape.setAsBox(enemies.get(i).getWidth()  / 2, enemies.get(i).getHeight() / 2);
+            enemyShape.setAsBox(enemies.get(i).getWidth()  / 2, (enemies.get(i).getHeight() / 2) - 0.1f);
             enemyFixtureDef = new FixtureDef();
             enemyFixtureDef.shape = enemyShape;
             enemyFixtureDef.density = 0.77f;
@@ -275,12 +275,12 @@ public class LevelScreen implements Screen, ControllerListener
         world.step(1 / 60f, 6, 2);
 
         player.setPosition(playerBody.getPosition().x - player.getWidth() / 2 / 25,
-                playerBody.getPosition().y - player.getHeight() / 2 / 25);
+                (playerBody.getPosition().y - player.getHeight() / 2 / 25));
 
         for(int i = 0 ; i < enemies.size ; i++)
         {
             enemies.get(i).setPosition(enemyBodies.get(i).getPosition().x - enemies.get(i).getWidth()/2,
-                enemyBodies.get(i).getPosition().y - enemies.get(i).getHeight() / 2);
+                (enemyBodies.get(i).getPosition().y - enemies.get(i).getHeight() / 2) + 0.1f);
         }
         
         //Hide box2d rendering
@@ -291,6 +291,7 @@ public class LevelScreen implements Screen, ControllerListener
     private void scrollCamera()
     {
         float horizontalDisplacement = 0.0f;
+        float verticalDisplacement = 0.0f;
         //On first frame
 
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
@@ -316,11 +317,12 @@ public class LevelScreen implements Screen, ControllerListener
         else
         {
             player.setRecentPosition(new Vector2(playerBody.getPosition().x, playerBody.getPosition().y));
-            orthoCamera.translate(horizontalDisplacement, 0.0f, 0.0f);
+            //orthoCamera.translate(horizontalDisplacement, 0.0f, 0.0f);
             
             horizontalDisplacement = player.getRecentPosition().x - player.getInitialPosition().x;
-
-            orthoCamera.translate(horizontalDisplacement, 0.0f, 0.0f);
+            verticalDisplacement = player.getRecentPosition().y - player.getInitialPosition().y;
+           
+            orthoCamera.translate(horizontalDisplacement, verticalDisplacement, 0.0f);
             player.setInitialPosition(player.getRecentPosition());
             player.setRecentPosition(null);
         }
@@ -333,9 +335,13 @@ public class LevelScreen implements Screen, ControllerListener
         Rectangle playerRect = player.getBoundingRectangle();
         Rectangle victoryRect = homeNetwork.getBoundingRectangle();
         
+        
 		if(playerRect.overlaps(victoryRect))
 		{
-			endGame();
+			firstController.removeListener(this);
+		    Controllers.removeListener(this);
+            //game.dispose();
+            game.setScreen(new VictoryScreen(game, firstController, totalElapsedTime));
 		}
 	    if(player.getY() <= fallHeight)
         {
@@ -350,6 +356,22 @@ public class LevelScreen implements Screen, ControllerListener
 		        endGame();
 	    }
         
+        for(EnemySprite enemy : enemies)
+        {
+
+            if(player.getBoundingRectangle().overlaps(enemy.getBoundingRectangle()))
+            {
+                LevelScreen.livesLeft--;
+                if (livesLeft > 0)
+                {
+                //FIXME Defeat animation
+                    firstController.removeListener(this);
+                    game.setScreen(new LevelScreen(game, firstController));
+                }
+                else
+		            endGame();
+            }
+        }
         wwweb.update(totalElapsedTime);
         homeNetwork.update(totalElapsedTime);
         //Run through Automata
@@ -384,8 +406,9 @@ public class LevelScreen implements Screen, ControllerListener
             }
         }
 
-        System.out.println("Is the player running?: " + player.isRunning);
+        //System.out.println("Is the player running?: " + player.isRunning);
         //Now do speed
+        /*
         if(player.isRunning)
         {
             if(player.isFacingRight)
@@ -393,6 +416,7 @@ public class LevelScreen implements Screen, ControllerListener
             else
                 playerBody.applyForceToCenter(-player.speedAccel, 0.0f,false);
         }
+        */
            
 
         player.update(totalElapsedTime, delta);
@@ -432,7 +456,12 @@ public class LevelScreen implements Screen, ControllerListener
 
         controller = firstController;
 
-                //Jump Button
+        if(buttonCode == controller.getMapping().buttonL1)
+        { 
+            System.out.println("Location: " + "X: " + playerBody.getPosition().x + " Y: " + playerBody.getPosition().y);
+        }
+
+        //Jump Button
         if (controller.getButton(controller.getMapping().buttonA) && player.isAllowedToJump)
         {
             playerBody.applyForceToCenter(0.0f, 125.0f, false);
@@ -451,11 +480,14 @@ public class LevelScreen implements Screen, ControllerListener
         }
 
         //FIXME Ask Libgdx community, why was this giving so much trouble!
-        if((player.isInputRight || player.isInputLeft) && buttonCode == controller.getMapping().buttonY ||
+
+        /*
+        if(player.jumpRecog == JumpStates.TWO_F && (player.isInputRight || player.isInputLeft) && buttonCode == controller.getMapping().buttonY ||
             buttonCode == controller.getMapping().buttonX)
         {
             player.isRunning = true;
         }
+        */
 
 
         return true;
@@ -473,11 +505,13 @@ public class LevelScreen implements Screen, ControllerListener
             player.isInputLeft = false;
         }
 
+        /*
         if(buttonCode == controller.getMapping().buttonY ||
              buttonCode == controller.getMapping().buttonX)
         {
             player.isRunning = false;
         }
+        */
 
         return false;
     }
@@ -490,15 +524,12 @@ public class LevelScreen implements Screen, ControllerListener
 
     @Override
     public void connected(Controller controller) {
-
-        //FIXME allow program to work with a controller connected during this session
 		System.out.println("Connection ESTABLISHED!");
 		try {
             controller.addListener(this);
         } catch (NullPointerException npe) {
         }
 		firstController = controller;
-        //throw new UnsupportedOperationException("Unimplemented method 'connected'");
     }
 
     @Override
@@ -538,4 +569,32 @@ public class LevelScreen implements Screen, ControllerListener
     @Override
     public void resume() 
 	{}
+
+    @Override
+    public void beginContact(Contact contact) {
+        
+        if(contact.getFixtureA().equals(playerFixture))
+        {
+
+        }
+        throw new UnsupportedOperationException("Unimplemented method 'beginContact'");
+    }
+
+    @Override
+    public void endContact(Contact contact) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'endContact'");
+    }
+
+    @Override
+    public void preSolve(Contact contact, Manifold oldManifold) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'preSolve'");
+    }
+
+    @Override
+    public void postSolve(Contact contact, ContactImpulse impulse) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'postSolve'");
+    }
 }

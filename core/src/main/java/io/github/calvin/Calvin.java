@@ -36,8 +36,7 @@ public class Calvin extends Game
         
         font.setUseIntegerPositions(false);
         font.getData().setScale(hud_viewport.getMinWorldHeight() / Gdx.graphics.getHeight());
-		
-		
+
 		//Implement controller support first
 		firstController = Controllers.getCurrent();
       

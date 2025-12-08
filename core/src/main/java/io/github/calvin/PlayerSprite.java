@@ -36,7 +36,7 @@ public class PlayerSprite extends Sprite
     float jumpAnimationTime;
 
     //Control faster movement
-    float speedAccel = 1.0f;
+    float speedAccel = 10.0f;
     boolean isRunning = false;
     float originalWalkSpeed;
     //Boolean for animation modification
