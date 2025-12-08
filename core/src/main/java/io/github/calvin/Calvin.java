@@ -30,11 +30,12 @@ public class Calvin extends Game
         batch = new SpriteBatch();
 
         font = new BitmapFont();
-
+        
         viewport = new ExtendViewport(HORIZONTAL_VP / PIXELS_IN_METERS, VERTICAL_VP / PIXELS_IN_METERS);
         hud_viewport = new ExtendViewport(HORIZONTAL_VP / PIXELS_IN_METERS, VERTICAL_VP / PIXELS_IN_METERS);
         
         font.setUseIntegerPositions(false);
+    
         font.getData().setScale(hud_viewport.getMinWorldHeight() / Gdx.graphics.getHeight());
 
 		//Implement controller support first

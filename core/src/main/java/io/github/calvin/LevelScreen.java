@@ -284,7 +284,7 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener
         }
         
         //Hide box2d rendering
-        b2ddr.render(world, orthoCamera.combined); // Matrix4 debug matrix
+        //b2ddr.render(world, orthoCamera.combined); // Matrix4 debug matrix
     }
 
 
@@ -353,7 +353,10 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener
                 game.setScreen(new LevelScreen(game, firstController));
             }
             else
-		        endGame();
+            {
+		        firstController.removeListener(this);
+                game.setScreen(new MainMenuScreen(game, firstController));
+            }
 	    }
         
         for(EnemySprite enemy : enemies)
@@ -369,7 +372,10 @@ public class LevelScreen implements Screen, ControllerListener, ContactListener
                     game.setScreen(new LevelScreen(game, firstController));
                 }
                 else
-		            endGame();
+                {
+		            firstController.removeListener(this);
+                    game.setScreen(new LevelScreen(game, firstController));
+                }
             }
         }
         wwweb.update(totalElapsedTime);
